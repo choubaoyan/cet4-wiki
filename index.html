@@ -208,7 +208,8 @@
   .wordlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2px 24px; margin-top: 16px; }
   .wordlist a { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; text-decoration: none; border-bottom: 1px solid #efe9dd; }
   .wordlist a:hover { color: var(--accent); }
-  .wordlist a em { font-style: normal; color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wordlist a span { white-space: nowrap; flex: 0 0 auto; }
+  .wordlist a em { font-style: normal; color: var(--muted); font-size: 13px; flex: 1 1 auto; min-width: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   .empty-box { border: 1px dashed var(--line); border-radius: var(--radius); padding: 34px; text-align: center; color: var(--muted); }
 
