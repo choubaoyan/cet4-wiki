@@ -25,7 +25,23 @@
     --font-ui: "Inter", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
     --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
   }
+  [data-theme="dark"] {
+    --bg: #101010;
+    --bg-sub: #191919;
+    --bg-strong: #ededed;
+    --ink: #ededed;
+    --ink-2: #b8b8b8;
+    --muted: #8f8f8f;
+    --line: #262626;
+    --line-2: #383838;
+  }
+  [data-theme="dark"] .hit { background: #2c2c2c; }
+  [data-theme="dark"] .quiz-option.right { background: #1d1d1d; }
+  [data-theme="dark"] .quiz-option.wrong { background: #161616; }
+  [data-theme="dark"] .letters a.dim { color: #3a3a3a; }
+
   * { box-sizing: border-box; }
+  html { background: var(--bg); }
   html, body { height: 100%; }
   body {
     margin: 0;
@@ -247,6 +263,36 @@
   .quiz-option.right { border-color: #111; background: #f2f2f2; }
   .quiz-option.wrong { border-color: #111; background: #fafafa; text-decoration: line-through; }
 
+  /* ---- 动效：克制，只做 1px 位移与透明度 ---- */
+  #app { animation: pagein .18s ease-out; }
+  @keyframes pagein { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+  .alpha a, .results .item, .wordlist a, .aside-card, .flashcard, .quiz-option,
+  .hist a, .btn, .letters a, .nav a, .mini, .phon button, .theme-toggle {
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease;
+  }
+  .alpha a:hover, .aside-card:hover, .flashcard:hover { transform: translateY(-1px); }
+  .wordlist a:hover { transform: translateX(2px); }
+
+  /* ---- 主题切换 ---- */
+  .theme-toggle {
+    display: flex; align-items: center; gap: var(--s2);
+    width: 100%; padding: var(--s2) var(--s3); margin-top: var(--s3);
+    border: 1px solid var(--line); border-radius: var(--r2);
+    color: var(--ink-2); font-size: 13px;
+  }
+  .theme-toggle:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ---- 生词本工具条 / 设置项 ---- */
+  .book-bar { display: flex; flex-wrap: wrap; gap: var(--s2); margin: var(--s4) 0 var(--s5); }
+  .book-bar .btn { width: auto; padding: 7px var(--s4); font-size: 13px; }
+  .check { display: flex; align-items: center; gap: var(--s2); font-size: 14px; color: var(--ink-2); margin-top: var(--s3); }
+  .check input { width: 15px; height: 15px; accent-color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
   footer.site { margin-top: var(--s7); padding-top: var(--s4); border-top: 1px solid var(--line);
     color: var(--muted); font-size: 12px; line-height: 1.9; }
 </style>
@@ -263,6 +309,8 @@
     <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6.5 9H4v6h2.5L11 19z"/><path d="M15 9.2a4 4 0 0 1 0 5.6"/><path d="M17.6 6.6a8 8 0 0 1 0 10.8"/></symbol>
     <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6"/></symbol>
     <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
   </defs>
 </svg>
 
@@ -279,6 +327,11 @@
 
     <div class="side-title">按字母</div>
     <div class="letters" id="letters"></div>
+
+    <button class="theme-toggle" id="theme-toggle" type="button">
+      <svg class="ico"><use id="theme-icon" href="#i-moon"/></svg>
+      <span id="theme-label">深色模式</span>
+    </button>
 
     <div class="progress">
       <div class="row"><span>已掌握</span><span id="known-count">0 / 2607</span></div>
@@ -335,6 +388,32 @@
   const app = document.getElementById('app');
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ---------- 朗读 ---------- */
+  function speakWord(text, lang = 'en-US') {
+    if (!text || typeof speechSynthesis === 'undefined') return;
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = lang;
+    u.rate = 0.95;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  /* ---------- 主题 ---------- */
+  const THEME_KEY = 'cet4.theme';
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    LS.set(THEME_KEY, theme);
+    const icon = document.getElementById('theme-icon');
+    const label = document.getElementById('theme-label');
+    if (icon) icon.setAttribute('href', theme === 'dark' ? '#i-sun' : '#i-moon');
+    if (label) label.textContent = theme === 'dark' ? '浅色模式' : '深色模式';
+  }
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+  applyTheme(LS.get(THEME_KEY, window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 
   /* ---------- 侧栏 ---------- */
   function renderSidebar() {
@@ -597,7 +676,11 @@
     return `
       <div class="crumb"><a href="#/">词库</a> / 生词本</div>
       <h1 style="margin:0 0 6px;font-size:30px">生词本</h1>
-      <p style="color:var(--muted);margin:0 0 18px">${list.length} 个词，存在本机浏览器里。</p>
+      <p style="color:var(--muted);margin:0">${list.length} 个词，存在本机浏览器里。</p>
+      ${list.length ? `<div class="book-bar">
+        <button class="btn" data-book-know>全部标记已掌握</button>
+        <button class="btn" data-book-clear>清空生词本</button>
+      </div>` : ''}
       ${list.length ? `<div class="wordlist">${list.map(w => `<a href="#/w/${encodeURIComponent(w.n)}"><span>${esc(w.n)}</span><em>${esc(w.t[0] || '')}</em></a>`).join('')}</div>`
         : '<div class="empty-box">还空着。去词条页点「加入生词本」，这里就会攒起来。</div>'}
     `;
@@ -661,6 +744,9 @@
         <li><code>Esc</code> 关闭搜索面板</li>
         <li>词卡页 <code>空格</code> 翻面</li>
       </ul>
+      <div class="section-h"><h2>阅读设置</h2></div>
+      <label class="check"><input type="checkbox" id="autoread" ${LS.get('cet4.autoread', true) ? 'checked' : ''}> 进入词条时自动朗读单词</label>
+
       <div class="section-h"><h2>数据</h2></div>
       <p>词条 ${WORDS.length} 条，含美/英音标与中文释义；形近词按编辑距离与共同前缀推导，不引入外部接口。</p>
       <p>其中 ${Object.keys(EXAMPLES).length} 个高频词配有中英对照例句，例句由 AI（DeepSeek Harness）生成并经人工挑选，仅作学习参考，不引用任何受版权保护的词典原文。朗读使用浏览器内置语音合成（Web Speech API），离线可用。</p>
@@ -679,19 +765,40 @@
     else if (parts[0] === 'about') { setActiveNav('about'); app.innerHTML = pageAbout(); }
     else { setActiveNav('home'); app.innerHTML = pageHome(); }
     renderSidebar();
+    app.style.animation = 'none';
+    void app.offsetHeight;
+    app.style.animation = '';
     window.scrollTo({ top: 0, behavior: 'instant' });
+
+    // 进入词条页自动朗读单词（可在「关于」里关掉）
+    if (parts[0] === 'w' && LS.get('cet4.autoread', true)) {
+      const word = decodeURIComponent(parts.slice(1).join('/'));
+      setTimeout(() => speakWord(word), 160);
+    }
   }
 
   /* ---------- 事件 ---------- */
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-book],[data-known],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
+    const t = e.target.closest('[data-book],[data-known],[data-book-know],[data-book-clear],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
     if (!t) return;
 
     if (t.dataset.speak) {
-      const u = new SpeechSynthesisUtterance(t.dataset.speak);
-      u.lang = t.dataset.lang || 'en-US';
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
+      speakWord(t.dataset.speak, t.dataset.lang || 'en-US');
+      return;
+    }
+    if (t.hasAttribute('data-book-clear')) {
+      if (!book.size) return;
+      if (window.confirm('清空生词本里的 ' + book.size + ' 个词？')) {
+        book.clear();
+        LS.set('cet4.book', []);
+        route();
+      }
+      return;
+    }
+    if (t.hasAttribute('data-book-know')) {
+      for (const n of book) known.add(n);
+      LS.set('cet4.known', [...known]);
+      route();
       return;
     }
     if (t.dataset.book) {
@@ -732,10 +839,30 @@
   });
 
   document.addEventListener('keydown', (e) => {
+    // 词条页 ← / → 切换上一个 / 下一个
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
+        location.hash.startsWith('#/w/') && document.activeElement.tagName !== 'INPUT') {
+      const name = decodeURIComponent(location.hash.slice(4));
+      const idx = INDEX.get(name.toLowerCase());
+      if (idx !== undefined) {
+        const target = WORDS[e.key === 'ArrowLeft' ? idx - 1 : idx + 1];
+        if (target) {
+          e.preventDefault();
+          location.hash = '#/w/' + encodeURIComponent(target.n);
+        }
+      }
+      return;
+    }
     if (e.key === ' ' && location.hash.startsWith('#/study') && document.activeElement.tagName !== 'INPUT') {
       e.preventDefault();
       study.flipped = !study.flipped;
       route();
+    }
+  });
+
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'autoread') {
+      LS.set('cet4.autoread', e.target.checked);
     }
   });
 
