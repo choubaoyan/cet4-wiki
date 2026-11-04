@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark" data-style="solid">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23ededed'/%3E%3C/svg%3E" />
+<title>动效实验室 · 从视频提取的四个动效</title>
+<style>
+  :root {
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+    --r1: 4px; --r2: 8px; --r3: 14px;
+    --bg: #0b0b0b; --panel: #141414; --ink: #ededed; --ink-2: #a8a8a8; --muted: #7a7a7a; --line: #262626;
+    --accent-a: #ff2d9b; --accent-b: #7b5bff; --accent-c: #2ea8ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.7 "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: var(--s7) var(--s5);
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 var(--s2); }
+  .lede { color: var(--ink-2); margin: 0 0 var(--s5); max-width: 64ch; }
+
+  .bar { display: flex; align-items: center; gap: var(--s2); margin: 0 0 var(--s6); flex-wrap: wrap; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r2); overflow: hidden; }
+  .seg button { padding: 6px var(--s4); font-size: 13px; color: var(--ink-2); background: none; border: 0; }
+  .seg button.on { background: var(--ink); color: var(--bg); }
+  .ghost { padding: 6px var(--s4); border: 1px solid var(--line); border-radius: var(--r2); font-size: 13px; color: var(--ink); background: none; }
+  .ghost:hover { border-color: var(--ink); }
+
+  .item { padding: var(--s5) 0; border-top: 1px solid var(--line); }
+  .item h2 { font-size: 13px; letter-spacing: .06em; color: var(--muted); font-weight: 500; margin: 0 0 var(--s4); }
+  .stage { display: grid; place-items: center; min-height: 200px; }
+
+  /* ---------- 1. 描边流光 ---------- */
+  .sweep-card {
+    position: relative; width: 340px; height: 150px; border-radius: var(--r3);
+    background: #0f0f0f; display: grid; place-items: center;
+    color: var(--ink-2); font-size: 13px;
+  }
+  .sweep-card::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+    background: conic-gradient(from var(--angle), transparent 0 62%, var(--accent-a) 76%, var(--accent-b) 86%, var(--accent-c) 92%, transparent 98%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: spin 2.8s linear infinite;
+  }
+  .sweep-card::after {
+    content: ""; position: absolute; inset: 12px; border-radius: inherit;
+    background: radial-gradient(60% 80% at 50% 120%, rgba(123, 91, 255, .35), transparent 70%);
+    filter: blur(16px); z-index: -1; opacity: .9;
+  }
+  @property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  @keyframes spin { to { --angle: 360deg; } }
+
+  /* 克制版：单色、无辉光 */
+  [data-style="solid"] .sweep-card::before {
+    background: conic-gradient(from var(--angle), transparent 0 88%, var(--ink) 94%, transparent 100%);
+    opacity: .9;
+  }
+  [data-style="solid"] .sweep-card::after { display: none; }
+
+  /* ---------- 2. 打字机 ---------- */
+  .type-line { font-size: 26px; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; }
+  .type-line span {
+    display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom;
+    width: 0; animation: typing 2.6s steps(22, end) infinite;
+    border-right: 1px solid var(--ink); padding-right: 2px;
+  }
+  @keyframes typing { 0%, 10% { width: 0 } 55%, 85% { width: 22ch } 100% { width: 0 } }
+
+  /* ---------- 3. 光点脉冲 ---------- */
+  .pulse { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+  .pulse i {
+    position: absolute; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--ink); animation: breathe 2s ease-in-out infinite;
+  }
+  .pulse u {
+    position: absolute; width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid var(--ink); opacity: 0; animation: ring 2s ease-out infinite;
+  }
+  .pulse u:nth-child(2) { animation-delay: .5s; }
+  .pulse u:nth-child(3) { animation-delay: 1s; }
+  @keyframes breathe { 0%, 100% { transform: scale(1); opacity: .9 } 50% { transform: scale(1.15); opacity: 1 } }
+  @keyframes ring { 0% { transform: scale(1); opacity: .5 } 100% { transform: scale(6); opacity: 0 } }
+
+  /* ---------- 4. 路径绘制 ---------- */
+  .wave { width: 420px; height: 90px; }
+  .wave path {
+    fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-linecap: round;
+    stroke-dasharray: 620; stroke-dashoffset: 620;
+    animation: draw 3s ease-in-out infinite;
+  }
+  @keyframes draw {
+    0% { stroke-dashoffset: 620 }
+    55% { stroke-dashoffset: 0 }
+    85% { stroke-dashoffset: 0; opacity: 1 }
+    100% { stroke-dashoffset: 0; opacity: 0 }
+  }
+
+  .note { color: var(--muted); font-size: 12px; margin: var(--s3) 0 0; }
+
+  /* 原片模式：给三个中性元素补回彩色 */
+  [data-style="gradient"] .pulse i { background: var(--accent-a); box-shadow: 0 0 24px var(--accent-a); }
+  [data-style="gradient"] .pulse u { border-color: var(--accent-b); }
+  [data-style="gradient"] .wave path { stroke: url(#grad); stroke-width: 2.2; filter: drop-shadow(0 0 8px rgba(123,91,255,.6)); }
+  [data-style="gradient"] .type-line span { color: transparent; background: linear-gradient(90deg, var(--accent-a), var(--accent-b)); -webkit-background-clip: text; background-clip: text; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>动效实验室</h1>
+  <p class="lede">
+    从参考视频里提取的四个动效机制：描边流光、打字机、光点脉冲、路径绘制。
+    默认「克制版」只用中性色与明暗对比（符合项目设计规范）；切到「原片」可以看到视频里的彩色渐变与辉光，用于对比差异。
+  </p>
+
+  <div class="bar">
+    <div class="seg" id="style-seg">
+      <button data-style-set="solid" class="on">克制版</button>
+      <button data-style-set="gradient">原片</button>
+    </div>
+    <button class="ghost" id="replay">重播</button>
+  </div>
+
+  <section class="item">
+    <h2>01 描边流光</h2>
+    <div class="stage">
+      <div class="sweep-card"><span>边框上一段光沿顺时针走一圈，2.8 秒一轮</span></div>
+    </div>
+    <p class="note">视频里是 1.5px 渐变描边 + 外侧辉光；克制版只留一段 1px 的单色游标，不发光。</p>
+  </section>
+
+  <section class="item">
+    <h2>02 打字机</h2>
+    <div class="stage">
+      <div class="type-line"><span>In A Natural Rhythm</span></div>
+    </div>
+    <p class="note">逐字符出现，末尾 1px 光标；视频里配了渐变文字，克制版用纯色。</p>
+  </section>
+
+  <section class="item">
+    <h2>03 光点脉冲</h2>
+    <div class="stage">
+      <div class="pulse"><i></i><u></u><u></u><u></u></div>
+    </div>
+    <p class="note">核心点轻微呼吸，外圈以 2 秒节奏扩张并淡出，错开 0.5 秒形成连续脉冲。</p>
+  </section>
+
+  <section class="item">
+    <h2>04 路径绘制</h2>
+    <div class="stage">
+      <svg class="wave" viewBox="0 0 420 90" aria-hidden="true">
+        <defs>
+          <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ff2d9b" /><stop offset="50%" stop-color="#7b5bff" /><stop offset="100%" stop-color="#2ea8ff" />
+          </linearGradient>
+        </defs>
+        <path d="M8 62 C 60 62, 70 26, 110 26 S 160 62, 200 62 S 250 26, 290 26 S 340 62, 380 44" />
+      </svg>
+    </div>
+    <p class="note">用 stroke-dashoffset 从 100% 画到 0，再停留一秒淡出；视频里是渐变描边，克制版是单色 1.5px。</p>
+  </section>
+</div>
+
+<script>
+  const seg = document.getElementById('style-seg');
+  const root = document.documentElement;
+
+  seg.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-style-set]');
+    if (!btn) return;
+    root.dataset.style = btn.dataset.styleSet;
+    [...seg.children].forEach((b) => b.classList.toggle('on', b === btn));
+  });
+
+  document.getElementById('replay').addEventListener('click', () => {
+    const stages = document.querySelectorAll('.stage');
+    stages.forEach((stage) => {
+      const clone = stage.cloneNode(true);
+      stage.replaceWith(clone);
+    });
+  });
+</script>
+</body>
+</html>

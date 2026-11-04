@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CET-4 词林 · 四级词汇百科</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%238b5a2b'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Georgia' fill='%23fbf9f5' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+<style>
+  /* ---- 设计令牌：间距 / 圆角 / 颜色 ---- */
+  :root {
+    --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+    --s5: 24px; --s6: 32px; --s7: 48px;
+
+    --r1: 4px; --r2: 6px; --r3: 8px;
+
+    --bg: #ffffff;
+    --bg-sub: #f6f6f6;
+    --bg-strong: #111111;
+    --ink: #111111;
+    --ink-2: #444444;
+    --muted: #767676;
+    --line: #e6e6e6;
+    --line-2: #d0d0d0;
+
+    --font-ui: "Inter", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  }
+  [data-theme="dark"] {
+    --bg: #101010;
+    --bg-sub: #191919;
+    --bg-strong: #ededed;
+    --ink: #ededed;
+    --ink-2: #b8b8b8;
+    --muted: #8f8f8f;
+    --line: #262626;
+    --line-2: #383838;
+  }
+  [data-theme="dark"] .hit { background: #2c2c2c; }
+  [data-theme="dark"] .quiz-option.right { background: #1d1d1d; }
+  [data-theme="dark"] .quiz-option.wrong { background: #161616; }
+  [data-theme="dark"] .letters a.dim { color: #3a3a3a; }
+
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.7 var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; }
+  input { font: inherit; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-sub); padding: 1px 5px; border-radius: var(--r1); }
+  h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+
+  /* 线性图标统一规格 */
+  .ico { width: 18px; height: 18px; flex: 0 0 auto; stroke: currentColor; fill: none;
+         stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ico-sm { width: 14px; height: 14px; }
+
+  /* ---- 布局 ---- */
+  .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+
+  .sidebar {
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+    padding: var(--s5) var(--s4) var(--s5);
+    position: sticky; top: 0; height: 100vh;
+    display: flex; flex-direction: column; gap: var(--s5);
+    overflow-y: auto;
+  }
+  .brand { display: flex; align-items: baseline; gap: var(--s2); padding: 0 var(--s2); }
+  .brand b { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
+  .brand span { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+  .nav { display: grid; gap: 2px; }
+  .nav a {
+    display: flex; align-items: center; gap: var(--s3);
+    padding: var(--s2) var(--s3); border-radius: var(--r2);
+    color: var(--ink-2); font-size: 14px;
+  }
+  .nav a:hover { background: var(--bg-sub); color: var(--ink); }
+  .nav a.on { background: var(--bg-sub); color: var(--ink); font-weight: 600; }
+  .nav a em { margin-left: auto; font-style: normal; font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+  .side-title {
+    font-size: 11px; letter-spacing: .08em; color: var(--muted);
+    padding: 0 var(--s2); margin-bottom: calc(var(--s2) * -1 + 4px);
+  }
+  .letters { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s1); }
+  .letters a {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 5px var(--s2); font-size: 13px; color: var(--ink-2);
+    border-radius: var(--r1); font-family: var(--font-mono);
+  }
+  .letters a:hover { background: var(--bg-sub); color: var(--ink); }
+  .letters a em { font-style: normal; font-size: 11px; color: var(--muted); }
+  .letters a.dim { color: #c9c9c9; pointer-events: none; }
+
+  .progress { margin-top: auto; border-top: 1px solid var(--line); padding-top: var(--s3); }
+  .progress .row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 var(--s2); }
+  .bar { height: 2px; background: var(--line); margin: var(--s2) var(--s2) 0; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .3s ease; }
+
+  main { padding: var(--s6) var(--s7) var(--s7); max-width: 860px; width: 100%; }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    main { padding: var(--s5) var(--s4) var(--s6); }
+  }
+
+  /* ---- 搜索 ---- */
+  .search-wrap { position: relative; margin-bottom: var(--s6); }
+  .search {
+    width: 100%; padding: 11px 40px 11px 40px;
+    border: 1px solid var(--line-2); background: var(--bg); border-radius: var(--r2);
+    outline: none; color: var(--ink);
+  }
+  .search::placeholder { color: var(--muted); }
+  .search:focus { border-color: var(--ink); }
+  .search-ico { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .search-wrap kbd {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: var(--r1); padding: 0 5px; line-height: 18px;
+  }
+  .results {
+    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + var(--s1));
+    background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--r2);
+    overflow: hidden; display: none;
+  }
+  .results.open { display: block; }
+  .results .item { display: flex; gap: var(--s3); align-items: baseline; padding: var(--s2) var(--s3); }
+  .results .item:hover, .results .item.sel { background: var(--bg-sub); }
+  .results .w { font-family: var(--font-mono); font-weight: 500; min-width: 120px; }
+  .results .d { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .results .empty { padding: var(--s3); color: var(--muted); font-size: 13px; }
+
+  /* ---- 首页 ---- */
+  .hero { padding-bottom: var(--s5); border-bottom: 1px solid var(--line); margin-bottom: var(--s5); }
+  .hero h1 { font-size: 26px; margin-bottom: var(--s2); }
+  .hero p { margin: 0; color: var(--ink-2); max-width: 62ch; font-size: 14px; }
+  .hero .stats { display: flex; gap: var(--s6); margin-top: var(--s4); }
+  .hero .stats div { font-size: 12px; color: var(--muted); }
+  .hero .stats b { display: block; font-size: 20px; color: var(--ink); font-weight: 600; font-family: var(--font-mono); }
+
+  .section-h { display: flex; align-items: baseline; justify-content: space-between;
+    margin: var(--s6) 0 var(--s3); padding-bottom: var(--s2); border-bottom: 1px solid var(--line); }
+  .section-h h2 { font-size: 13px; letter-spacing: .06em; }
+  .section-h span { font-size: 12px; color: var(--muted); }
+
+  .alpha { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: var(--s2); }
+  .alpha a {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: var(--s2) var(--s3); border: 1px solid var(--line); border-radius: var(--r2);
+    font-family: var(--font-mono); font-size: 13px;
+  }
+  .alpha a:hover { border-color: var(--ink); }
+  .alpha a em { font-style: normal; font-size: 11px; color: var(--muted); }
+
+  .hist { display: flex; flex-wrap: wrap; gap: var(--s2); }
+  .hist a, .hist button {
+    padding: 3px var(--s3); border: 1px solid var(--line); border-radius: var(--r1);
+    font-size: 13px; color: var(--ink-2);
+  }
+  .hist a:hover, .hist button:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ---- 词条 ---- */
+  .crumb { font-size: 12px; color: var(--muted); margin-bottom: var(--s4); }
+  .crumb a:hover { color: var(--ink); }
+  .crumb span { color: var(--line-2); margin: 0 var(--s1); }
+
+  .entry h1 { font-size: 38px; line-height: 1.15; letter-spacing: -0.02em; }
+  .phon { display: flex; gap: var(--s2); flex-wrap: wrap; margin: var(--s3) 0 0; }
+  .phon button {
+    display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid var(--line); border-radius: var(--r1);
+    padding: 2px var(--s2); font-size: 13px; color: var(--ink-2); font-family: var(--font-mono);
+  }
+  .phon button:hover { border-color: var(--ink); color: var(--ink); }
+  .phon .tag { color: var(--muted); font-size: 12px; margin-right: var(--s1); }
+
+  .entry-grid { display: grid; grid-template-columns: minmax(0, 1fr) 208px; gap: var(--s6); margin-top: var(--s5); }
+  @media (max-width: 760px) { .entry-grid { grid-template-columns: 1fr; } }
+
+  .defs { margin: 0; padding: 0; list-style: none; }
+  .defs li {
+    display: grid; grid-template-columns: 24px 1fr; gap: var(--s2);
+    padding: var(--s3) 0; border-bottom: 1px solid var(--line);
+    font-size: 16px; line-height: 1.75;
+  }
+  .defs li i { font-style: normal; font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding-top: 4px; }
+
+  .example { margin-top: var(--s3); padding-left: var(--s3); border-left: 2px solid var(--line-2); }
+  .example .en { margin: 0 0 var(--s1); font-size: 15px; display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+  .example .zh { margin: 0; color: var(--muted); font-size: 13px; }
+  .mini {
+    display: inline-flex; align-items: center; gap: 4px;
+    border: 1px solid var(--line); border-radius: var(--r1);
+    padding: 1px var(--s2); font-size: 12px; color: var(--ink-2); font-family: var(--font-ui);
+  }
+  .mini:hover { border-color: var(--ink); color: var(--ink); }
+  .muted { color: var(--muted); font-size: 13px; margin: var(--s2) 0 0; }
+
+  .aside-card { border: 1px solid var(--line); border-radius: var(--r2); padding: var(--s4); }
+  .aside-card h3 { font-size: 11px; letter-spacing: .08em; color: var(--muted); margin-bottom: var(--s3); }
+  .aside-card dl { margin: 0 0 var(--s3); display: grid; grid-template-columns: auto 1fr; gap: var(--s2); font-size: 13px; }
+  .aside-card dt { color: var(--muted); }
+  .aside-card dd { margin: 0; text-align: right; font-family: var(--font-mono); }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: var(--s2);
+    width: 100%; padding: 9px var(--s3); border: 1px solid var(--line-2);
+    border-radius: var(--r2); font-size: 14px; color: var(--ink);
+  }
+  .btn:hover { border-color: var(--ink); }
+  .btn + .btn { margin-top: var(--s2); }
+  .btn.on { background: var(--bg-strong); border-color: var(--bg-strong); color: var(--bg); }
+
+  .pager { display: flex; align-items: center; justify-content: space-between;
+    margin-top: var(--s6); padding-top: var(--s3); border-top: 1px solid var(--line); }
+  .pager a { display: inline-flex; align-items: center; gap: var(--s2); font-size: 13px; color: var(--ink-2); }
+  .pager a:hover { color: var(--ink); }
+  .pager span { color: var(--muted); font-size: 12px; font-family: var(--font-mono); }
+
+  .rel { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s3); }
+  .rel a {
+    padding: 2px var(--s2); border: 1px solid var(--line); border-radius: var(--r1);
+    font-size: 13px; font-family: var(--font-mono);
+  }
+  .rel a:hover { border-color: var(--ink); }
+
+  /* ---- 列表 ---- */
+  .wordlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0 var(--s5); margin-top: var(--s2); }
+  .wordlist a { display: flex; align-items: baseline; gap: var(--s3); padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .wordlist a:hover span { text-decoration: underline; }
+  .wordlist a span { font-family: var(--font-mono); font-size: 14px; }
+  .wordlist a em { font-style: normal; color: var(--muted); font-size: 12px; flex: 1; min-width: 0;
+                   text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hit { background: #ededed; }
+  .empty-box { border: 1px dashed var(--line-2); border-radius: var(--r2); padding: var(--s6); text-align: center; color: var(--muted); font-size: 14px; }
+
+  /* ---- 学习 ---- */
+  .study-meta { display: flex; gap: var(--s5); color: var(--muted); font-size: 12px; font-family: var(--font-mono); margin-bottom: var(--s4); }
+  .card-area { display: grid; place-items: center; padding: var(--s5) 0; }
+  .flashcard {
+    width: min(520px, 100%); min-height: 260px; border: 1px solid var(--line-2); border-radius: var(--r3);
+    background: var(--bg); display: grid; place-items: center; text-align: center; padding: var(--s6);
+    cursor: pointer; position: relative;
+  }
+  .flashcard .front { font-size: 36px; font-family: var(--font-mono); letter-spacing: -0.01em; }
+  .flashcard .back { font-size: 17px; line-height: 1.9; }
+  .flashcard .hint { position: absolute; bottom: var(--s3); font-size: 12px; color: var(--muted); }
+  .study-actions { display: flex; gap: var(--s2); justify-content: center; margin-top: var(--s5); }
+  .study-actions .btn { width: auto; padding: 9px var(--s5); }
+  .quiz-option {
+    display: block; width: 100%; text-align: left; padding: var(--s3) var(--s4); margin-bottom: var(--s2);
+    border: 1px solid var(--line-2); border-radius: var(--r2); font-size: 15px;
+  }
+  .quiz-option:hover { border-color: var(--ink); }
+  .quiz-option.right { border-color: #111; background: #f2f2f2; }
+  .quiz-option.wrong { border-color: #111; background: #fafafa; text-decoration: line-through; }
+
+  /* ---- 动效：克制，只做 1px 位移与透明度 ---- */
+  #app { animation: pagein .18s ease-out; }
+  @keyframes pagein { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+  .alpha a, .results .item, .wordlist a, .aside-card, .flashcard, .quiz-option,
+  .hist a, .btn, .letters a, .nav a, .mini, .phon button, .theme-toggle {
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease;
+  }
+  .alpha a:hover, .aside-card:hover, .flashcard:hover { transform: translateY(-1px); }
+  .wordlist a:hover { transform: translateX(2px); }
+
+  /* ---- 主题切换 ---- */
+  .theme-toggle {
+    display: flex; align-items: center; gap: var(--s2);
+    width: 100%; padding: var(--s2) var(--s3); margin-top: var(--s3);
+    border: 1px solid var(--line); border-radius: var(--r2);
+    color: var(--ink-2); font-size: 13px;
+  }
+  .theme-toggle:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ---- 生词本工具条 / 设置项 ---- */
+  .book-bar { display: flex; flex-wrap: wrap; gap: var(--s2); margin: var(--s4) 0 var(--s5); }
+  .book-bar .btn { width: auto; padding: 7px var(--s4); font-size: 13px; }
+  .check { display: flex; align-items: center; gap: var(--s2); font-size: 14px; color: var(--ink-2); margin-top: var(--s3); }
+  .check input { width: 15px; height: 15px; accent-color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+
+  /* ---- 片头 ---- */
+  .intro {
+    position: fixed; inset: 0; z-index: 100;
+    display: grid; place-items: center;
+    background: var(--bg);
+    transition: opacity .45s ease;
+  }
+  .intro.out { opacity: 0; pointer-events: none; }
+  .intro-inner { text-align: center; padding: 0 var(--s5); }
+  .intro-logo {
+    width: 176px; height: auto; color: var(--ink); display: block; margin: 0 auto;
+    opacity: 0; transform: translateY(8px);
+    animation: introLogo .62s cubic-bezier(.2,.7,.2,1) .06s forwards;
+  }
+  .intro-cn {
+    margin-top: var(--s4); font-size: 12px; letter-spacing: .52em; text-indent: .52em;
+    color: var(--muted); opacity: 0;
+    animation: introUp .5s ease .42s forwards;
+  }
+  .intro-line {
+    width: 0; height: 1px; background: var(--line-2); margin: var(--s4) auto 0;
+    animation: introLine .7s cubic-bezier(.3,.8,.2,1) .58s forwards;
+  }
+  .intro-slogan {
+    margin: var(--s4) 0 0; font-size: 14px; color: var(--ink-2); opacity: 0;
+    animation: introUp .5s ease .82s forwards;
+  }
+  .intro-skip {
+    position: fixed; right: var(--s5); bottom: var(--s5);
+    padding: 5px var(--s3); font-size: 12px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: var(--r1); background: transparent;
+  }
+  .intro-skip:hover { color: var(--ink); border-color: var(--ink); }
+
+  @keyframes introLogo { to { opacity: 1; transform: none; } }
+  @keyframes introUp { to { opacity: 1; transform: none; } }
+  @keyframes introLine { to { width: 96px; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro { display: none; }
+  }
+
+  footer.site { margin-top: var(--s7); padding-top: var(--s4); border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 12px; line-height: 1.9; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v18H6.5A1.5 1.5 0 0 1 5 19.5z"/><path d="M9.5 3v18"/></symbol>
+    <symbol id="i-cards" viewBox="0 0 24 24"><rect x="3.5" y="7" width="11" height="14" rx="1.5"/><path d="M7.5 4h9a2 2 0 0 1 2 2v11"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.6v.6"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6.5 9H4v6h2.5L11 19z"/><path d="M15 9.2a4 4 0 0 1 0 5.6"/><path d="M17.6 6.6a8 8 0 0 1 0 10.8"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
+  </defs>
+</svg>
+
+<div class="intro" id="intro">
+  <div class="intro-inner">
+    <svg class="intro-logo" viewBox="0 0 143 23" fill="none"><path d="M78.6784 18.6813H77.1077V16.2462H78.6784C79.6513 16.2462 80.6341 16.0037 81.2672 15.3298C81.9009 14.6559 82.14 13.6222 82.14 12.589C82.14 11.5559 81.9109 10.5222 81.2672 9.84884C80.6246 9.17496 79.6513 8.93245 78.6784 8.93245C77.7056 8.93245 76.7227 9.17496 76.0885 9.84884C75.4549 10.5227 75.2157 11.5559 75.2157 12.589V22.5899H72.4604V6.50684H75.2157V7.53106H75.7209C75.7756 7.46792 75.8304 7.41428 75.8857 7.36064C76.5752 6.73146 77.6307 6.50684 78.6684 6.50684C80.2944 6.50684 81.9193 6.91138 82.9849 8.03451C84.0499 9.15764 84.4265 10.8826 84.4265 12.5991C84.4265 14.3156 84.0404 16.0316 82.9849 17.1637C81.9288 18.2958 80.2944 18.6824 78.6784 18.6824V18.6813Z" fill="currentColor"></path><path d="M36.7486 6.93999H38.3188V9.37511H36.7486C35.7752 9.37511 34.7929 9.61762 34.1593 10.2915C33.5256 10.9654 33.287 11.9991 33.287 13.0323C33.287 14.0654 33.5167 15.0986 34.1593 15.7725C34.8019 16.4463 35.7752 16.6888 36.7486 16.6888C37.722 16.6888 38.7049 16.4463 39.3385 15.7725C39.9722 15.0986 40.2108 14.0654 40.2108 13.0323V3.02246H42.9655V19.115H40.2108V18.0908H39.7056C39.6503 18.1534 39.5955 18.2076 39.5402 18.2612C38.8513 18.8898 37.7952 19.115 36.7576 19.115C35.1321 19.115 33.5066 18.711 32.4416 17.5879C31.3766 16.4648 31 14.7393 31 13.0233C31 11.3073 31.3856 9.5908 32.4416 8.45873C33.5066 7.3356 35.1321 6.93999 36.7486 6.93999Z" fill="currentColor"></path><path d="M56.7855 12.8145V13.794H49.4483V11.8445H54.3151C54.2051 11.1348 53.948 10.4699 53.4887 9.98433C52.8277 9.28363 51.8079 9.03218 50.7982 9.03218C49.7886 9.03218 48.7688 9.28363 48.1078 9.98433C47.4468 10.685 47.2076 11.7545 47.2076 12.8151C47.2076 13.8756 47.4462 14.9535 48.1078 15.6452C48.7688 16.337 49.788 16.5979 50.7982 16.5979C51.8085 16.5979 52.8277 16.3465 53.4887 15.6452C53.5804 15.5463 53.6631 15.4385 53.7458 15.3306H56.4642C56.2256 16.1755 55.849 16.9393 55.2796 17.5322C54.1777 18.6911 52.479 19.1135 50.7982 19.1135C49.1175 19.1135 47.4188 18.7 46.3169 17.5322C45.215 16.3644 44.811 14.5852 44.811 12.8151C44.811 11.0449 45.2061 9.25681 46.3169 8.09792C47.4283 6.93903 49.1175 6.5166 50.7982 6.5166C52.479 6.5166 54.1777 6.93009 55.2796 8.09792C56.3904 9.26575 56.7855 11.0449 56.7855 12.8151V12.8145Z" fill="currentColor"></path><path d="M70.6151 12.8145V13.794H63.2779V11.8445H68.1447C68.0341 11.1348 67.7776 10.4699 67.3183 9.98433C66.6573 9.28363 65.6375 9.03218 64.6278 9.03218C63.6181 9.03218 62.5984 9.28363 61.9374 9.98433C61.2763 10.685 61.0372 11.7545 61.0372 12.8151C61.0372 13.8756 61.2758 14.9535 61.9374 15.6452C62.5984 16.337 63.6181 16.5979 64.6278 16.5979C65.6375 16.5979 66.6573 16.3465 67.3183 15.6452C67.4105 15.5463 67.4927 15.4385 67.5748 15.3306H70.2938C70.0546 16.1755 69.678 16.9393 69.1086 17.5322C68.0067 18.6911 66.3081 19.1135 64.6278 19.1135C62.9476 19.1135 61.2484 18.7 60.1465 17.5322C59.0446 16.3644 58.6406 14.5852 58.6406 12.8151C58.6406 11.0449 59.0357 9.25681 60.1465 8.09792C61.2579 6.93903 62.9471 6.5166 64.6278 6.5166C66.3086 6.5166 68.0067 6.93009 69.1086 8.09792C70.22 9.26575 70.6151 11.0449 70.6151 12.8151V12.8145Z" fill="currentColor"></path><path d="M92.2781 19.1146C93.9589 19.1146 95.657 18.8721 96.7589 18.1804C97.8607 17.4886 98.2653 16.437 98.2653 15.3949C98.2653 14.3528 97.8697 13.2922 96.7589 12.6094C95.657 11.9266 93.9583 11.6746 92.2781 11.6746C91.5612 11.6746 90.9002 11.5757 90.4319 11.3153C89.9637 11.0454 89.7893 10.6414 89.7893 10.2369C89.7893 9.83234 89.9547 9.41941 90.4319 9.15846C90.9002 8.88858 91.626 8.79917 92.3418 8.79917C93.0576 8.79917 93.7834 8.89808 94.2528 9.15846C94.721 9.42835 94.8954 9.83234 94.8954 10.2369H97.6959C97.6959 9.19422 97.3383 8.13424 96.3375 7.45142C95.3368 6.76861 93.803 6.5166 92.2786 6.5166C90.7543 6.5166 89.2211 6.75911 88.2197 7.45142C87.219 8.14318 86.8603 9.19422 86.8603 10.2369C86.8603 11.2796 87.2184 12.3395 88.2197 13.0224C89.2205 13.7052 90.7538 13.9572 92.2786 13.9572C93.0682 13.9572 93.941 14.0561 94.464 14.3165C94.9881 14.5774 95.1714 14.9903 95.1714 15.3949C95.1714 15.7994 94.9881 16.2124 94.464 16.4733C93.941 16.7337 93.1419 16.8326 92.3524 16.8326C91.5629 16.8326 90.7543 16.7337 90.2397 16.4733C89.7256 16.2129 89.5323 15.7994 89.5323 15.3949H86.2998C86.2998 16.4376 86.6943 17.4975 87.8063 18.1804C88.9171 18.8632 90.5979 19.1146 92.2786 19.1146H92.2781Z" fill="currentColor"></path><path d="M112.094 12.8145V13.794H104.757V11.8445H109.624C109.514 11.1348 109.257 10.4699 108.798 9.98433C108.136 9.28363 107.117 9.03218 106.106 9.03218C105.095 9.03218 104.077 9.28363 103.416 9.98433C102.755 10.685 102.517 11.7545 102.517 12.8151C102.517 13.8756 102.755 14.9535 103.416 15.6452C104.077 16.337 105.097 16.5979 106.106 16.5979C107.116 16.5979 108.136 16.3465 108.798 15.6452C108.889 15.5463 108.972 15.4385 109.054 15.3306H111.772C111.533 16.1755 111.157 16.9393 110.588 17.5322C109.486 18.6911 107.787 19.1135 106.106 19.1135C104.425 19.1135 102.727 18.7 101.625 17.5322C100.524 16.3644 100.12 14.5852 100.12 12.8151C100.12 11.0449 100.515 9.25681 101.625 8.09792C102.737 6.93903 104.427 6.5166 106.106 6.5166C107.786 6.5166 109.486 6.93009 110.588 8.09792C111.699 9.26575 112.093 11.0449 112.093 12.8151L112.094 12.8145Z" fill="currentColor"></path><path d="M125.924 12.8145V13.794H118.586V11.8445H123.453C123.344 11.1348 123.086 10.4699 122.627 9.98433C121.966 9.28363 120.947 9.03218 119.936 9.03218C118.926 9.03218 117.907 9.28363 117.246 9.98433C116.585 10.685 116.346 11.7545 116.346 12.8151C116.346 13.8756 116.585 14.9535 117.246 15.6452C117.907 16.337 118.927 16.5979 119.936 16.5979C120.946 16.5979 121.966 16.3465 122.627 15.6452C122.719 15.5463 122.801 15.4385 122.884 15.3306H125.602C125.363 16.1755 124.987 16.9393 124.418 17.5322C123.316 18.6911 121.617 19.1135 119.936 19.1135C118.256 19.1135 116.558 18.7 115.456 17.5322C114.354 16.3644 113.949 14.5852 113.949 12.8151C113.949 11.0449 114.344 9.25681 115.456 8.09792C116.566 6.93903 118.256 6.5166 119.936 6.5166C121.617 6.5166 123.315 6.93009 124.418 8.09792C125.529 9.26575 125.924 11.0449 125.924 12.8151V12.8145Z" fill="currentColor"></path><path d="M130.524 3.02246H127.77V19.115H130.524V3.02246Z" fill="currentColor"></path><path d="M135.227 12.4374L139.744 19.1136H136.337L131.819 12.4374L136.337 7.07324H139.744L135.227 12.4374Z" fill="currentColor"></path><g clip-path="url(#clip0_logo)"><path d="M26.5174 3.39471C26.235 3.2567 26.1137 3.52006 25.9487 3.65346C25.8923 3.69659 25.8446 3.75294 25.7969 3.80469C25.3846 4.24516 24.9027 4.53439 24.2737 4.49989C23.3536 4.44814 22.5682 4.73737 21.8735 5.44119C21.7258 4.57349 21.2353 4.0554 20.4889 3.72304C20.0985 3.55054 19.7034 3.37746 19.4297 3.00197C19.2388 2.73459 19.1865 2.43673 19.091 2.14289C19.0301 1.96579 18.9697 1.78466 18.7656 1.75418C18.5442 1.71968 18.4574 1.90541 18.3705 2.06067C18.0232 2.69549 17.8887 3.39471 17.9019 4.10313C17.9324 5.6965 18.6051 6.96556 19.9421 7.86834C20.0939 7.97184 20.133 8.07535 20.0852 8.22658C19.9938 8.53766 19.8857 8.83955 19.7903 9.15063C19.7293 9.34901 19.6384 9.39271 19.4257 9.30588C18.692 8.9994 18.0583 8.54571 17.4982 7.99772C16.5477 7.07827 15.6881 6.06336 14.6162 5.26869C14.3644 5.08296 14.1125 4.91045 13.8521 4.746C12.7584 3.68394 13.9952 2.81164 14.2816 2.70814C14.5812 2.60003 14.3857 2.22857 13.4179 2.23317C12.4502 2.2372 11.5646 2.56151 10.4359 2.99335C10.2708 3.05832 10.0972 3.10547 9.91951 3.14457C8.8954 2.95022 7.83162 2.90709 6.72069 3.03245C4.62877 3.26533 2.95777 4.25436 1.72954 5.94261C0.254043 7.97184 -0.0932678 10.2777 0.33167 12.6824C0.778458 15.2171 2.07225 17.3153 4.06008 18.9558C6.12152 20.6567 8.49577 21.4905 11.2047 21.3306C12.8498 21.2358 14.6812 21.0155 16.7473 19.2669C17.2682 19.5262 17.8151 19.6297 18.7219 19.7074C19.4205 19.7723 20.0933 19.6729 20.6143 19.5648C21.4302 19.3923 21.3739 18.6367 21.0789 18.4981C18.6874 17.3843 19.2124 17.8374 18.7351 17.4706C19.9501 16.033 21.8063 13.4776 22.379 9.99821C22.4353 9.61409 22.5072 9.073 22.4986 8.76192C22.494 8.57216 22.5377 8.49856 22.7545 8.47671C23.3536 8.40771 23.935 8.24383 24.4692 7.94999C26.0188 7.10357 26.6439 5.71318 26.7911 4.04678C26.8129 3.79204 26.7865 3.52869 26.5174 3.39471ZM13.0143 18.3946C10.6964 16.5724 9.5722 15.9726 9.10816 15.9985C8.67402 16.0244 8.75222 16.5212 8.84768 16.8449C8.94773 17.1646 9.07768 17.3849 9.25996 17.6655C9.38589 17.8512 9.47272 18.1272 9.13404 18.3348C8.38766 18.7965 7.08985 18.1796 7.0289 18.1491C5.51833 17.2595 4.25559 16.0853 3.36546 14.4793C2.50581 12.9337 2.0067 11.2753 1.92447 9.50542C1.90262 9.07818 2.02855 8.92695 2.45406 8.84932C3.01413 8.74582 3.59144 8.72397 4.15093 8.80619C6.51656 9.15178 8.53027 10.2092 10.2185 11.8848C11.1822 12.8388 11.9114 13.979 12.6623 15.0929C13.461 16.2757 14.3201 17.4027 15.4144 18.3268C15.8008 18.6505 16.109 18.8966 16.404 19.0783C15.5144 19.1778 14.0297 19.1991 13.0143 18.3958V18.3946ZM14.1252 11.2489C14.1252 11.0591 14.277 10.9079 14.4679 10.9079C14.511 10.9079 14.5501 10.9165 14.5852 10.9292C14.6329 10.9464 14.6766 10.9723 14.7111 11.0114C14.7721 11.0718 14.8066 11.158 14.8066 11.2489C14.8066 11.4386 14.6548 11.5899 14.4639 11.5899C14.273 11.5899 14.1252 11.4386 14.1252 11.2489ZM17.5759 13.0188C17.3545 13.1096 17.1331 13.1873 16.9203 13.1959C16.5903 13.2131 16.2303 13.0791 16.0348 12.9153C15.7312 12.6605 15.5139 12.5179 15.423 12.0734C15.3839 11.8837 15.4057 11.5899 15.4402 11.4214C15.5185 11.0585 15.4316 10.8257 15.1757 10.614C14.9676 10.4415 14.7025 10.3938 14.4115 10.3938C14.3029 10.3938 14.2034 10.3461 14.1292 10.3076C14.0079 10.2472 13.9078 10.096 14.0033 9.91023C14.0338 9.84985 14.1815 9.70322 14.216 9.67734C14.6111 9.45251 15.0665 9.52612 15.488 9.6946C15.8784 9.85445 16.174 10.1477 16.5989 10.5623C17.033 11.0631 17.1112 11.2011 17.3585 11.5772C17.554 11.871 17.7317 12.1729 17.8536 12.5185C17.9272 12.7341 17.8317 12.9107 17.5759 13.0188Z" fill="currentColor"></path></g><defs><clipPath id="clip0_logo"><rect width="26.634" height="19.6" fill="currentColor" transform="translate(0.163086 1.75)"></rect></clipPath></defs></svg>
+    <div class="intro-cn">深度求索</div>
+    <div class="intro-line"></div>
+    <p class="intro-slogan">让智能，触手可及</p>
+  </div>
+  <button class="intro-skip" id="intro-skip" type="button">跳过</button>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><b>CET-4 词林</b><span>v1.0</span></div>
+
+    <nav class="nav" id="nav">
+      <a href="#/" data-route="home"><svg class="ico"><use href="#i-home"/></svg><span>首页</span></a>
+      <a href="#/book" data-route="book"><svg class="ico"><use href="#i-book"/></svg><span>生词本</span><em id="book-count">0</em></a>
+      <a href="#/study" data-route="study"><svg class="ico"><use href="#i-cards"/></svg><span>学习模式</span></a>
+      <a href="#/about" data-route="about"><svg class="ico"><use href="#i-info"/></svg><span>关于</span></a>
+    </nav>
+
+    <div class="side-title">按字母</div>
+    <div class="letters" id="letters"></div>
+
+    <button class="theme-toggle" id="theme-toggle" type="button">
+      <svg class="ico"><use id="theme-icon" href="#i-moon"/></svg>
+      <span id="theme-label">深色模式</span>
+    </button>
+
+    <div class="progress">
+      <div class="row"><span>已掌握</span><span id="known-count">0 / 2607</span></div>
+      <div class="bar"><i id="known-bar"></i></div>
+      <div class="row"><span>生词</span><span id="book-count-2">0</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="search-wrap">
+        <svg class="ico search-ico"><use href="#i-search"/></svg>
+      <input id="q" class="search" type="search" placeholder="搜索单词或中文释义，例如 abandon / 放弃" autocomplete="off" spellcheck="false" />
+      <kbd>/</kbd>
+      <div class="results" id="results"></div>
+    </div>
+    <div id="app"></div>
+    <footer class="site">
+      词库来源：CET-4 核心词汇 2607 条 · 纯静态单页，可离线打开 · 学习记录只存本机浏览器<br>制作工具：DeepSeek Harness（DSH）· 视觉规范参考 Anthropic Skills 的 frontend-design / theme-factory
+    </footer>
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="examples.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  const WORDS = (window.CET4_WORDS || []).map(w => ({
+    n: w.n,
+    t: Array.isArray(w.t) ? w.t : [String(w.t || '')],
+    u: w.u || '',
+    k: w.k || '',
+    lower: w.n.toLowerCase(),
+  }));
+
+  const EXAMPLES = window.CET4_EXAMPLES || {};
+  const INDEX = new Map(WORDS.map((w, i) => [w.lower, i]));
+  const byLetter = new Map();
+  for (const w of WORDS) {
+    const L = w.n[0].toUpperCase();
+    if (!byLetter.has(L)) byLetter.set(L, []);
+    byLetter.get(L).push(w);
+  }
+
+  const LS = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  let book = new Set(LS.get('cet4.book', []));
+  let known = new Set(LS.get('cet4.known', []));
+  let recent = LS.get('cet4.recent', []);
+
+  const app = document.getElementById('app');
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ---------- 朗读 ---------- */
+  function speakWord(text, lang = 'en-US') {
+    if (!text || typeof speechSynthesis === 'undefined') return;
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = lang;
+    u.rate = 0.95;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  /* ---------- 主题 ---------- */
+  const THEME_KEY = 'cet4.theme';
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    LS.set(THEME_KEY, theme);
+    const icon = document.getElementById('theme-icon');
+    const label = document.getElementById('theme-label');
+    if (icon) icon.setAttribute('href', theme === 'dark' ? '#i-sun' : '#i-moon');
+    if (label) label.textContent = theme === 'dark' ? '浅色模式' : '深色模式';
+  }
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+  applyTheme(LS.get(THEME_KEY, window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+  /* ---------- 侧栏 ---------- */
+  function renderSidebar() {
+    const letters = document.getElementById('letters');
+    letters.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(L => {
+      const n = byLetter.get(L)?.length || 0;
+      return n
+        ? `<a href="#/l/${L}">${L}<em>${n}</em></a>`
+        : `<a class="dim">${L}</a>`;
+    }).join('');
+
+    const pct = WORDS.length ? (known.size / WORDS.length) * 100 : 0;
+    $('#known-count').textContent = `${known.size} / ${WORDS.length}`;
+    $('#known-bar').style.width = pct.toFixed(1) + '%';
+    $('#book-count').textContent = String(book.size);
+    $('#book-count-2').textContent = String(book.size);
+  }
+
+  function setActiveNav(route) {
+    document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.route === route));
+  }
+
+  /* ---------- 搜索 ---------- */
+  const qInput = $('#q');
+  const resultsBox = $('#results');
+  let sel = -1;
+  let current = [];
+
+  function search(q) {
+    const s = q.trim().toLowerCase();
+    if (!s) return [];
+    const exact = [], prefix = [], sub = [], cn = [];
+    for (const w of WORDS) {
+      if (w.lower === s) exact.push(w);
+      else if (w.lower.startsWith(s)) prefix.push(w);
+      else if (w.lower.includes(s)) sub.push(w);
+      else if (w.t.some(t => t.includes(s))) cn.push(w);
+      if (exact.length + prefix.length + sub.length + cn.length > 400) break;
+    }
+    return [...exact, ...prefix, ...sub, ...cn].slice(0, 12);
+  }
+
+  function renderResults(list) {
+    current = list;
+    sel = -1;
+    if (!list.length) {
+      resultsBox.innerHTML = '<div class="empty">没有匹配的词，试试换一个拼写或中文关键词</div>';
+      resultsBox.classList.add('open');
+      return;
+    }
+    resultsBox.innerHTML = list.map((w, i) => `
+      <a class="item" href="#/w/${encodeURIComponent(w.n)}" data-i="${i}">
+        <span class="w">${esc(w.n)}</span>
+        <span class="d">${esc(w.t.join('；'))}</span>
+      </a>`).join('')
+      + `<a class="item" style="justify-content:center;color:var(--accent)" href="#/search/${encodeURIComponent(qInput.value.trim())}">查看全部「${esc(qInput.value.trim())}」的结果</a>`;
+    resultsBox.classList.add('open');
+  }
+
+  qInput.addEventListener('input', () => renderResults(search(qInput.value)));
+  qInput.addEventListener('focus', () => { if (qInput.value.trim()) renderResults(search(qInput.value)); });
+  qInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { resultsBox.classList.remove('open'); qInput.blur(); return; }
+    if (!current.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + current.length) % current.length;
+      [...resultsBox.querySelectorAll('.item')].forEach((el, i) => el.classList.toggle('sel', i === sel));
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const w = current[sel < 0 ? 0 : sel];
+      if (w) { pushHistory(qInput.value.trim()); qInput.value = ''; resultsBox.classList.remove('open'); location.hash = '#/w/' + encodeURIComponent(w.n); }
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (!resultsBox.contains(e.target) && e.target !== qInput) resultsBox.classList.remove('open');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement !== qInput) { e.preventDefault(); qInput.focus(); }
+  });
+
+  /* ---------- 页面 ---------- */
+  function pushHistory(q) {
+    if (!q) return;
+    let h = LS.get('cet4.history', []);
+    h = [q, ...h.filter(x => x !== q)].slice(0, 8);
+    LS.set('cet4.history', h);
+  }
+
+  function highlight(text, q) {
+    const t = esc(text);
+    if (!q) return t;
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return t.replace(new RegExp('(' + safe + ')', 'gi'), '<span class="hit">$1</span>');
+  }
+
+  function pageSearch(q) {
+    const s = String(q || '').trim();
+    const hits = search(s);
+    const all = [];
+    if (s) {
+      const low = s.toLowerCase();
+      for (const w of WORDS) {
+        if (w.lower.includes(low) || w.t.some(t => t.includes(s))) all.push(w);
+      }
+    }
+    return `
+      <div class="crumb"><a href="#/">词库</a> / 搜索</div>
+      <h1 style="margin:0 0 6px;font-size:28px">「${esc(s)}」</h1>
+      <p class="muted" style="margin:0 0 20px">命中 ${all.length} 个词条${hits.length ? '，前 ' + hits.length + ' 个已按相关度排序' : ''}</p>
+      ${all.length
+        ? `<div class="wordlist">${all.slice(0, 120).map(w => `<a href="#/w/${encodeURIComponent(w.n)}"><span>${highlight(w.n, s)}</span><em>${esc(w.t.join('；'))}</em></a>`).join('')}</div>`
+        : '<div class="empty-box">没有命中。试试更短的拼写，或者换个中文关键词。</div>'}
+    `;
+  }
+
+  function pageHome() {
+    const today = WORDS[Math.floor((Date.now() / 86400000)) % WORDS.length];
+    const rec = recent.slice(0, 6).map(n => INDEX.get(n.toLowerCase())).filter(i => i !== undefined).map(i => WORDS[i]);
+    return `
+      <section class="hero">
+        <h1>四级词汇百科</h1>
+        <p>把 CET-4 的 ${WORDS.length} 个核心词做成可查阅、可标记、可复习的词典。左边按字母翻，顶上直接搜；遇到不熟的词点「加入生词本」，学完点「已掌握」。</p>
+        <div class="stats">
+          <div><b>${WORDS.length}</b>收录词条</div>
+          <div><b>${byLetter.size}</b>首字母分组</div>
+          <div><b>${known.size}</b>已掌握</div>
+          <div><b>${book.size}</b>生词本</div>
+        </div>
+      </section>
+
+      ${(LS.get('cet4.history', []).length) ? `
+      <div class="section-h"><h2>最近搜索</h2><span>点一下再来一次</span></div>
+      <div class="hist">${LS.get('cet4.history', []).map(q => `<a href="#/search/${encodeURIComponent(q)}">${esc(q)}</a>`).join('')}</div>` : ''}
+
+      <div class="section-h"><h2>今日一词</h2><span>每天换一个</span></div>
+      <a class="rel" style="text-decoration:none" href="#/w/${encodeURIComponent(today.n)}">
+        <span style="font-size:22px;font-family:ui-monospace,monospace">${esc(today.n)}</span>
+        <span style="color:var(--muted)">${esc(today.t.join('；'))}</span>
+      </a>
+
+      <div class="section-h"><h2>按字母浏览</h2><span>共 ${byLetter.size} 组</span></div>
+      <div class="alpha">
+        ${[...byLetter.keys()].sort().map(L => `<a href="#/l/${L}">${L}<em>${byLetter.get(L).length}</em></a>`).join('')}
+      </div>
+
+      ${rec.length ? `
+      <div class="section-h"><h2>最近看过</h2><span>${rec.length} 条</span></div>
+      <div class="rel">${rec.map(w => `<a href="#/w/${encodeURIComponent(w.n)}">${esc(w.n)}</a>`).join('')}</div>` : ''}
+    `;
+  }
+
+  function pageLetter(L) {
+    const list = byLetter.get(L) || [];
+    return `
+      <div class="crumb"><a href="#/">词库</a> / ${L}</div>
+      <h1 style="margin:0 0 6px;font-size:30px">${L}</h1>
+      <p style="color:var(--muted);margin:0">${list.length} 个词条</p>
+      <div class="wordlist">
+        ${list.map(w => `<a href="#/w/${encodeURIComponent(w.n)}"><span>${esc(w.n)}</span><em>${esc(w.t[0] || '')}</em></a>`).join('')}
+      </div>
+    `;
+  }
+
+  function similarWords(w) {
+    const base = w.lower;
+    const head = base.slice(0, 3);
+    const cands = [];
+    for (const other of WORDS) {
+      if (other.lower === base) continue;
+      if (other.lower.startsWith(head)) { cands.push([other, 0]); continue; }
+      if (Math.abs(other.lower.length - base.length) <= 1 && other.lower[0] === base[0] && editDistance(other.lower, base) <= 2) cands.push([other, 1]);
+      if (cands.length > 60) break;
+    }
+    return cands.sort((a, b) => a[1] - b[1] || a[0].lower.length - b[0].lower.length).slice(0, 8).map(x => x[0]);
+  }
+
+  function editDistance(a, b) {
+    const m = a.length, n = b.length;
+    if (Math.abs(m - n) > 2) return 9;
+    let prev = Array.from({ length: n + 1 }, (_, j) => j);
+    for (let i = 1; i <= m; i++) {
+      const cur = [i];
+      for (let j = 1; j <= n; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
+
+  function pageWord(name) {
+    const idx = INDEX.get(String(name).toLowerCase());
+    if (idx === undefined) {
+      return `<div class="empty-box">词库里没有「${esc(name)}」。<br><a href="#/">回到首页</a> 再搜一次？</div>`;
+    }
+    const w = WORDS[idx];
+    const inBook = book.has(w.lower);
+    const isKnown = known.has(w.lower);
+    const rel = similarWords(w);
+    const prev = WORDS[idx - 1], next = WORDS[idx + 1];
+
+    recent = [w.n, ...recent.filter(x => x.toLowerCase() !== w.lower)].slice(0, 12);
+    LS.set('cet4.recent', recent);
+
+    return `
+      <div class="crumb"><a href="#/">词库</a> / <a href="#/l/${w.n[0].toUpperCase()}">${w.n[0].toUpperCase()}</a> / ${esc(w.n)}</div>
+      <article class="entry">
+        <h1>${esc(w.n)}</h1>
+        <div class="phon">
+          ${w.u ? `<span>美 <button data-speak="${esc(w.n)}" data-lang="en-US">${esc(w.u)}</button></span>` : ''}
+          ${w.k ? `<span>英 <button data-speak="${esc(w.n)}" data-lang="en-GB">${esc(w.k)}</button></span>` : ''}
+        </div>
+
+        <div class="entry-grid">
+          <section>
+            <div class="section-h" style="margin-top:6px"><h2>释义</h2></div>
+            <ol class="defs">${w.t.map((t, i) => `<li><i>${String(i + 1).padStart(2, '0')}</i><span>${esc(t)}</span></li>`).join('')}</ol>
+
+            <div class="section-h" style="margin-top:26px"><h2>例句</h2><span>${EXAMPLES[w.n] ? '点击喇叭跟读' : ''}</span></div>
+            ${EXAMPLES[w.n]
+              ? `<div class="example">
+                   <p class="en">${esc(EXAMPLES[w.n].en)} <button class="mini" data-speak="${esc(EXAMPLES[w.n].en)}" data-lang="en-US"><svg class="ico ico-sm"><use href="#i-volume"/></svg>朗读</button></p>
+                   <p class="zh">${esc(EXAMPLES[w.n].zh)}</p>
+                 </div>`
+              : `<p class="muted">这个词暂时没有例句，先用上面的音标跟读；例句正在陆续补充。</p>`}
+
+            ${rel.length ? `
+            <div class="section-h"><h2>形近 / 同前缀</h2><span>按相似度排</span></div>
+            <div class="rel">${rel.map(r => `<a href="#/w/${encodeURIComponent(r.n)}">${esc(r.n)}</a>`).join('')}</div>` : ''}
+          </section>
+
+          <aside>
+            <div class="aside-card">
+              <h3>词条信息</h3>
+              <dl>
+                <dt>首字母</dt><dd>${w.n[0].toUpperCase()}</dd>
+                <dt>长度</dt><dd>${w.n.length}</dd>
+                <dt>释义数</dt><dd>${w.t.length}</dd>
+                <dt>序号</dt><dd>${idx + 1}</dd>
+              </dl>
+              <button class="btn ${inBook ? 'on' : ''}" data-book="${esc(w.n)}">${inBook ? '已在生词本' : '加入生词本'}</button>
+              <button class="btn ${isKnown ? 'on' : ''}" data-known="${esc(w.n)}">${isKnown ? '已掌握' : '标记已掌握'}</button>
+            </div>
+          </aside>
+        </div>
+
+        <div class="pager">
+          ${prev ? `<a href="#/w/${encodeURIComponent(prev.n)}"><svg class="ico ico-sm"><use href="#i-left"/></svg>${esc(prev.n)}</a>` : '<span>已经是第一个</span>'}
+          <span>${idx + 1} / ${WORDS.length}</span>
+          ${next ? `<a href="#/w/${encodeURIComponent(next.n)}">${esc(next.n)}<svg class="ico ico-sm"><use href="#i-right"/></svg></a>` : '<span>已经是最后一个</span>'}
+        </div>
+      </article>
+    `;
+  }
+
+  function pageBook() {
+    const list = [...book].map(n => INDEX.get(n)).filter(i => i !== undefined).map(i => WORDS[i]);
+    return `
+      <div class="crumb"><a href="#/">词库</a> / 生词本</div>
+      <h1 style="margin:0 0 6px;font-size:30px">生词本</h1>
+      <p style="color:var(--muted);margin:0">${list.length} 个词，存在本机浏览器里。</p>
+      ${list.length ? `<div class="book-bar">
+        <button class="btn" data-book-know>全部标记已掌握</button>
+        <button class="btn" data-book-clear>清空生词本</button>
+      </div>` : ''}
+      ${list.length ? `<div class="wordlist">${list.map(w => `<a href="#/w/${encodeURIComponent(w.n)}"><span>${esc(w.n)}</span><em>${esc(w.t[0] || '')}</em></a>`).join('')}</div>`
+        : '<div class="empty-box">还空着。去词条页点「加入生词本」，这里就会攒起来。</div>'}
+    `;
+  }
+
+  /* ---------- 学习模式 ---------- */
+  let study = { mode: 'flash', queue: [], i: 0, flipped: false, right: 0, wrong: 0, answered: false };
+
+  function buildQueue() {
+    const pool = book.size ? [...book].map(n => INDEX.get(n)).filter(i => i !== undefined).map(i => WORDS[i]) : WORDS;
+    study.queue = pool.slice().sort(() => Math.random() - 0.5).slice(0, 20);
+    study.i = 0; study.right = 0; study.wrong = 0; study.flipped = false; study.answered = false;
+  }
+
+  function pageStudy() {
+    if (!study.queue.length) buildQueue();
+    const w = study.queue[study.i];
+    if (!w) {
+      return `<div class="crumb"><a href="#/">词库</a> / 学习模式</div>
+        <div class="empty-box"><p>这一轮结束了：答对 ${study.right}，答错 ${study.wrong}。</p>
+        <button class="btn" style="width:auto;display:inline-block" data-restart>再来一轮</button></div>`;
+    }
+    if (study.mode === 'flash') {
+      return `
+        <div class="crumb"><a href="#/">词库</a> / 学习模式</div>
+        <div class="study-meta"><span>${book.size ? '生词本' : '全部词库'}</span><span>${study.i + 1} / ${study.queue.length}</span><span>已掌握 ${known.size}</span></div>
+        <div class="card-area">
+          <div class="flashcard" data-flip>
+            ${study.flipped
+              ? `<div class="back">${w.t.map(esc).join('<br>')}</div>`
+              : `<div><div class="front">${esc(w.n)}</div>${w.u ? `<div style="color:var(--muted);font-family:ui-monospace,monospace">${esc(w.u)}</div>` : ''}</div>`}
+            <div class="hint">点卡片翻面 · 空格键也行</div>
+          </div>
+        </div>
+        <div class="study-actions">
+          <button class="btn" data-skip>不认识，下一个</button>
+          <button class="btn on" data-know>认识，记下来</button>
+        </div>`;
+    }
+    const options = [w, ...[0, 1, 2].map(() => WORDS[Math.floor(Math.random() * WORDS.length)]).filter(x => x.lower !== w.lower)];
+    const shuffled = options.slice().sort(() => Math.random() - 0.5);
+    return `
+      <div class="crumb"><a href="#/">词库</a> / 学习模式</div>
+      <div class="study-meta"><span>看词选义</span><span>${study.i + 1} / ${study.queue.length}</span><span>对 ${study.right} · 错 ${study.wrong}</span></div>
+      <div style="margin:26px 0 8px;font-size:36px;font-family:ui-monospace,monospace">${esc(w.n)}</div>
+      <div style="color:var(--muted);font-family:ui-monospace,monospace;margin-bottom:18px">${esc(w.u)}</div>
+      ${shuffled.map((o, i) => `<button class="quiz-option" data-answer="${esc(o.n)}">${esc(o.t.join('；'))}</button>`).join('')}
+      <div style="margin-top:14px;font-size:13px;color:var(--muted)">选错了会直接告诉你正确答案</div>`;
+  }
+
+  /* ---------- 关于 ---------- */
+  function pageAbout() {
+    return `
+      <div class="crumb"><a href="#/">词库</a> / 关于</div>
+      <h1 style="margin:0 0 14px;font-size:30px">关于这个页面</h1>
+      <p>这是一个纯静态的四级词汇百科：没有后端、没有账号、不联网也能用。所有数据都在 <code>data.js</code> 里，学习记录（生词本、已掌握）存在浏览器 localStorage。</p>
+      <div class="section-h"><h2>快捷键</h2></div>
+      <ul style="line-height:2">
+        <li><code>/</code> 聚焦搜索框</li>
+        <li><code>↑</code> <code>↓</code> 在搜索结果间移动，<code>Enter</code> 打开</li>
+        <li><code>Esc</code> 关闭搜索面板</li>
+        <li>词卡页 <code>空格</code> 翻面</li>
+      </ul>
+      <div class="section-h"><h2>阅读设置</h2></div>
+      <button class="btn" style="width:auto;display:inline-flex;margin-top:var(--s3)" id="replay-intro">重播片头</button>
+      <label class="check"><input type="checkbox" id="autoread" ${LS.get('cet4.autoread', true) ? 'checked' : ''}> 进入词条时自动朗读单词</label>
+
+      <div class="section-h"><h2>数据</h2></div>
+      <p>词条 ${WORDS.length} 条，含美/英音标与中文释义；形近词按编辑距离与共同前缀推导，不引入外部接口。</p>
+      <p>其中 ${Object.keys(EXAMPLES).length} 个高频词配有中英对照例句，例句由 AI（DeepSeek Harness）生成并经人工挑选，仅作学习参考，不引用任何受版权保护的词典原文。朗读使用浏览器内置语音合成（Web Speech API），离线可用。</p>
+    `;
+  }
+
+  /* ---------- 路由 ---------- */
+  function route() {
+    const hash = location.hash.replace(/^#/, '') || '/';
+    const parts = hash.split('/').filter(Boolean);
+    if (parts[0] === 'w') { setActiveNav(''); app.innerHTML = pageWord(decodeURIComponent(parts.slice(1).join('/'))); }
+    else if (parts[0] === 'l') { setActiveNav(''); app.innerHTML = pageLetter(parts[1]); }
+    else if (parts[0] === 'book') { setActiveNav('book'); app.innerHTML = pageBook(); }
+    else if (parts[0] === 'study') { setActiveNav('study'); app.innerHTML = pageStudy(); }
+    else if (parts[0] === 'search') { setActiveNav(''); app.innerHTML = pageSearch(decodeURIComponent(parts.slice(1).join('/'))); }
+    else if (parts[0] === 'about') { setActiveNav('about'); app.innerHTML = pageAbout(); }
+    else { setActiveNav('home'); app.innerHTML = pageHome(); }
+    renderSidebar();
+    app.style.animation = 'none';
+    void app.offsetHeight;
+    app.style.animation = '';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    // 进入词条页自动朗读单词（可在「关于」里关掉）
+    if (parts[0] === 'w' && LS.get('cet4.autoread', true)) {
+      const word = decodeURIComponent(parts.slice(1).join('/'));
+      setTimeout(() => speakWord(word), 160);
+    }
+  }
+
+  /* ---------- 事件 ---------- */
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-book],[data-known],[data-book-know],[data-book-clear],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
+    if (!t) return;
+
+    if (t.dataset.speak) {
+      speakWord(t.dataset.speak, t.dataset.lang || 'en-US');
+      return;
+    }
+    if (t.hasAttribute('data-book-clear')) {
+      if (!book.size) return;
+      if (window.confirm('清空生词本里的 ' + book.size + ' 个词？')) {
+        book.clear();
+        LS.set('cet4.book', []);
+        route();
+      }
+      return;
+    }
+    if (t.hasAttribute('data-book-know')) {
+      for (const n of book) known.add(n);
+      LS.set('cet4.known', [...known]);
+      route();
+      return;
+    }
+    if (t.dataset.book) {
+      const key = t.dataset.book.toLowerCase();
+      book.has(key) ? book.delete(key) : book.add(key);
+      LS.set('cet4.book', [...book]);
+      route();
+      return;
+    }
+    if (t.dataset.known) {
+      const key = t.dataset.known.toLowerCase();
+      known.has(key) ? known.delete(key) : known.add(key);
+      LS.set('cet4.known', [...known]);
+      route();
+      return;
+    }
+    if (t.hasAttribute('data-flip')) { study.flipped = !study.flipped; route(); return; }
+    if (t.hasAttribute('data-know')) {
+      known.add(study.queue[study.i].lower);
+      LS.set('cet4.known', [...known]);
+      study.i++; study.flipped = false; route(); return;
+    }
+    if (t.hasAttribute('data-skip')) { study.i++; study.flipped = false; route(); return; }
+    if (t.hasAttribute('data-restart')) { study.queue = []; route(); return; }
+    if (t.dataset.answer) {
+      const w = study.queue[study.i];
+      const ok = t.dataset.answer === w.n;
+      t.classList.add(ok ? 'right' : 'wrong');
+      if (!ok) {
+        const el = [...document.querySelectorAll('.quiz-option')].find(o => o.dataset.answer === w.n);
+        if (el) el.classList.add('right');
+      }
+      ok ? study.right++ : study.wrong++;
+      if (ok) known.add(w.lower);
+      LS.set('cet4.known', [...known]);
+      setTimeout(() => { study.i++; route(); }, ok ? 420 : 1100);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    // 词条页 ← / → 切换上一个 / 下一个
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
+        location.hash.startsWith('#/w/') && document.activeElement.tagName !== 'INPUT') {
+      const name = decodeURIComponent(location.hash.slice(4));
+      const idx = INDEX.get(name.toLowerCase());
+      if (idx !== undefined) {
+        const target = WORDS[e.key === 'ArrowLeft' ? idx - 1 : idx + 1];
+        if (target) {
+          e.preventDefault();
+          location.hash = '#/w/' + encodeURIComponent(target.n);
+        }
+      }
+      return;
+    }
+    if (e.key === ' ' && location.hash.startsWith('#/study') && document.activeElement.tagName !== 'INPUT') {
+      e.preventDefault();
+      study.flipped = !study.flipped;
+      route();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'replay-intro') {
+      sessionStorage.removeItem('cet4.intro');
+      location.reload();
+    }
+  });
+
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'autoread') {
+      LS.set('cet4.autoread', e.target.checked);
+    }
+  });
+
+
+  /* ---------- 片头 ---------- */
+  (function intro() {
+    const el = document.getElementById('intro');
+    if (!el) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || sessionStorage.getItem('cet4.intro') === '1') {
+      el.remove();
+      return;
+    }
+    sessionStorage.setItem('cet4.intro', '1');
+    document.documentElement.style.overflow = 'hidden';
+    const close = () => {
+      if (!document.body.contains(el)) return;
+      el.classList.add('out');
+      document.documentElement.style.overflow = '';
+      setTimeout(() => el.remove(), 460);
+    };
+    setTimeout(close, 2100);
+    el.querySelector('#intro-skip').addEventListener('click', close);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); }, { once: true });
+  })();
+
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
