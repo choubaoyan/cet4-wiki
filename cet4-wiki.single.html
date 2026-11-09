@@ -18,6 +18,7 @@
     --muted: #6f6f6f;
     --line: #e5e3dd;
     --line-strong: #c9c6bd;
+    --accent: #d0021b;
 
     --rail: 208px;
     --col: 36em;
@@ -270,6 +271,41 @@
   .hit { background: var(--ink); color: var(--paper); }
   .empty-box { background: var(--block); padding: var(--s7); text-align: center; color: var(--muted); font-size: 15px; }
 
+  /* ---- 真题 ---- */
+  .exam-head { border-top: 3px solid var(--ink); padding-top: var(--s3); margin-bottom: var(--s5); }
+  .exam-band { display: flex; justify-content: space-between; align-items: center;
+               background: var(--accent); color: #fff; padding: 4px var(--s3);
+               font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+               margin-bottom: var(--s4); }
+  .exam-head h1 { font-size: 30px; font-weight: 300; }
+  .exam-total { color: var(--muted); font-size: 15px; margin-left: var(--s2); font-family: var(--font-mono); }
+  .exam-q { font-size: 19px; line-height: 1.8; margin: 0 0 var(--s5); max-width: 34em; }
+  .exam-opts { display: grid; gap: var(--s2); max-width: 40em; }
+  .exam-opt { display: grid; grid-template-columns: 28px 1fr; gap: var(--s3); align-items: baseline;
+              text-align: left; padding: var(--s3) var(--s4); background: var(--block); font-size: 16px; }
+  .exam-opt i { font-style: normal; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .exam-opt:hover { background: var(--line); }
+  .exam-opt.right { background: var(--ink); color: var(--paper); }
+  .exam-opt.right i { color: var(--paper); opacity: .6; }
+  .exam-opt.wrong { background: transparent; box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent); }
+  .exam-tip { margin-top: var(--s5); padding-left: var(--s4); border-left: 3px solid var(--accent); }
+  .exam-tip b { font-size: 13px; letter-spacing: .1em; color: var(--accent); }
+  .exam-tip p { margin: var(--s2) 0 var(--s4); color: var(--ink-2); font-size: 15px; }
+  .exam-done { background: var(--block); padding: var(--s7); }
+  .exam-done h1 { font-size: 26px; font-weight: 300; margin-bottom: var(--s3); }
+  .wrong-q { display: grid; gap: var(--s3); }
+  .wrong-q div { background: var(--block); padding: var(--s4); }
+  .wrong-q b { font-weight: 500; font-size: 15px; }
+  .wrong-q p { margin: var(--s2) 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  /* ---- 首页功能简介 ---- */
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px;
+              background: var(--line); border: 1px solid var(--line); margin-top: var(--s2); }
+  .features article { background: var(--paper); padding: var(--s4); }
+  .features h3 { font-size: 14px; font-weight: 500; margin-bottom: var(--s2); display: flex; align-items: center; gap: var(--s2); }
+  .features p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+  .features .ico { color: var(--accent); }
+
   /* ---- 学习 ---- */
   .mode-switch { display: flex; gap: var(--s4); margin-bottom: var(--s4); }
   .mode-switch button {
@@ -325,7 +361,7 @@
   .intro {
     position: fixed; inset: 0; z-index: 200;
     display: grid; place-items: center;
-    background: var(--bg);
+    background: var(--paper);
     transition: opacity .45s ease;
   }
   .intro.out { opacity: 0; pointer-events: none; }
@@ -341,7 +377,7 @@
     animation: introUp .5s ease .42s forwards;
   }
   .intro-line {
-    width: 0; height: 1px; background: var(--line-2); margin: var(--s4) auto 0;
+    width: 0; height: 1px; background: var(--line-strong); margin: var(--s4) auto 0;
     animation: introLine .7s cubic-bezier(.3,.8,.2,1) .58s forwards;
   }
   .intro-slogan {
@@ -407,6 +443,7 @@
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v18H6.5A1.5 1.5 0 0 1 5 19.5z"/><path d="M9.5 3v18"/></symbol>
+    <symbol id="i-paper" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h3"/></symbol>
     <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></symbol>
     <symbol id="i-cards" viewBox="0 0 24 24"><rect x="3.5" y="7" width="11" height="14" rx="1.5"/><path d="M7.5 4h9a2 2 0 0 1 2 2v11"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.6v.6"/></symbol>
@@ -444,7 +481,8 @@
       <a href="#/" data-route="home"><svg class="ico"><use href="#i-home"/></svg><span>首页</span></a>
       <a href="#/book" data-route="book"><svg class="ico"><use href="#i-book"/></svg><span>生词本</span><em id="book-count">0</em></a>
     <a href="#/wrong" data-route="wrong"><svg class="ico"><use href="#i-flag"/></svg><span>错题本</span><em id="wrong-count">0</em></a>
-      <a href="#/study" data-route="study"><svg class="ico"><use href="#i-cards"/></svg><span>学习模式</span></a>
+      <a href="#/exam" data-route="exam"><svg class="ico"><use href="#i-paper"/></svg><span>真题</span><em id="exam-count">0</em></a>
+    <a href="#/study" data-route="study"><svg class="ico"><use href="#i-cards"/></svg><span>学习模式</span></a>
       <a href="#/about" data-route="about"><svg class="ico"><use href="#i-info"/></svg><span>关于</span></a>
     </nav>
 
@@ -625,6 +663,25 @@ window.CET4_EXAMPLES = {
   familiar:     { en: "The street looks familiar, but I can't name it.", zh: "这条街看着眼熟，但我说不出名字。" }
 };
 </script>
+<script>window.CET_QUIZ = [
+  { id: "q1", lv: "cet4", type: "词汇", q: "The manager asked us to ______ the report before Friday.", opts: ["submit", "submerge", "subsist", "subscribe"], a: 0, tip: "submit 提交；submerge 淹没；subsist 维持生存；subscribe 订阅。" },
+  { id: "q2", lv: "cet4", type: "词汇", q: "Her explanation was so ______ that everyone understood at once.", opts: ["vague", "explicit", "awkward", "temporary"], a: 1, tip: "explicit 明确的；vague 含糊的；awkward 尴尬的；temporary 临时的。" },
+  { id: "q3", lv: "cet4", type: "语法", q: "By the time we arrived, the meeting ______ for ten minutes.", opts: ["has begun", "had begun", "had been on", "was beginning"], a: 2, tip: "by the time + 过去时，主句用过去完成时；begin 是短暂动词，与一段时间连用要换成 be on。" },
+  { id: "q4", lv: "cet4", type: "词汇", q: "The two departments must ______ closely to avoid duplicated work.", opts: ["compete", "cooperate", "complain", "conclude"], a: 1, tip: "cooperate 合作；compete 竞争；complain 抱怨；conclude 得出结论。" },
+  { id: "q5", lv: "cet4", type: "语法", q: "It is the third time that he ______ late this week.", opts: ["is", "was", "has been", "had been"], a: 2, tip: "It is the … time that 从句用现在完成时。" },
+  { id: "q6", lv: "cet4", type: "词汇", q: "Nothing can ______ him to change his mind once he has decided.", opts: ["persuade", "prohibit", "pretend", "proceed"], a: 0, tip: "persuade sb. to do 说服某人做；prohibit 禁止；pretend 假装；proceed 继续进行。" },
+  { id: "q7", lv: "cet4", type: "阅读", q: "阅读：\"The library extended its opening hours during the exam period, but staff reported that the noise level rose sharply.\" What problem did the extension cause?", opts: ["Fewer books were borrowed", "Staff worked fewer hours", "Noise increased", "The building was closed"], a: 2, tip: "转折 but 后面才是重点：noise level rose sharply = 噪音上升。" },
+  { id: "q8", lv: "cet4", type: "词汇", q: "The company will ______ a new policy next month.", opts: ["adapt", "adopt", "adept", "admit"], a: 1, tip: "adopt 采纳/实施（政策）；adapt 适应/改编；adept 熟练的（形容词）。" },
+  { id: "q9", lv: "cet6", type: "词汇", q: "The committee's decision was widely seen as a ______ to the earlier proposal.", opts: ["complement", "compliment", "compromise", "component"], a: 2, tip: "compromise 折中方案；complement 补充物；compliment 赞美；component 组成部分。" },
+  { id: "q10", lv: "cet6", type: "词汇", q: "His argument was ______; it rested on a single unverified assumption.", opts: ["robust", "tenuous", "prudent", "meticulous"], a: 1, tip: "tenuous 脆弱的、站不住脚的；robust 稳健的；prudent 谨慎的；meticulous 一丝不苟的。" },
+  { id: "q11", lv: "cet6", type: "语法", q: "______ the heavy rain, the outdoor ceremony went ahead as planned.", opts: ["Despite", "Although", "Because", "Unless"], a: 0, tip: "despite + 名词短语；although 后接从句。the heavy rain 是名词短语。" },
+  { id: "q12", lv: "cet6", type: "词汇", q: "The new evidence may ______ the conclusion drawn by earlier researchers.", opts: ["undermine", "underline", "undertake", "undergo"], a: 0, tip: "undermine 削弱、动摇；underline 强调；undertake 承担；undergo 经历。" },
+  { id: "q13", lv: "cet6", type: "词汇", q: "The report calls for a more ______ approach to urban planning.", opts: ["holistic", "hostile", "hollow", "homely"], a: 0, tip: "holistic 整体的、全面的；hostile 敌对的；hollow 空心的；homely 朴素的。" },
+  { id: "q14", lv: "cet6", type: "语法", q: "Only after the experiment failed ______ the importance of the control group.", opts: ["they realised", "did they realise", "they did realise", "realised they"], a: 1, tip: "only + 状语置于句首，主句部分倒装：did they realise。" },
+  { id: "q15", lv: "cet6", type: "阅读", q: "阅读：\"Remote work reduced commuting time, yet many employees reported feeling more isolated than before.\" What is the trade-off described?", opts: ["Higher pay but longer hours", "Less commuting but more isolation", "Fewer meetings but slower work", "Better tools but weaker skills"], a: 1, tip: "yet 前后是取舍关系：通勤时间减少 vs 孤独感增加。" },
+  { id: "q16", lv: "cet6", type: "词汇", q: "The professor was known for her ______ lectures, which left little room for questions.", opts: ["terse", "tedious", "tentative", "tangible"], a: 0, tip: "terse 简洁（甚至简短生硬）的；tedious 冗长的；tentative 试探性的；tangible 有形的。" }
+];
+</script>
 <script>
 (() => {
   'use strict';
@@ -754,6 +811,8 @@ window.CET4_EXAMPLES = {
     $('#known-bar').style.width = pct.toFixed(1) + '%';
     $('#book-count').textContent = String(book.size);
     $('#book-count-2').textContent = String(book.size);
+    const ec = document.getElementById('exam-count');
+    if (ec) ec.textContent = String((window.CET_QUIZ || []).filter(q => level === 'all' || q.lv === level).length);
     const wc = document.getElementById('wrong-count');
     if (wc) wc.textContent = String(Object.keys(wrongBook).length);
   }
@@ -876,6 +935,14 @@ window.CET4_EXAMPLES = {
       ${(LS.get('cet4.history', []).length) ? `
       <div class="section-h"><h2>最近搜索</h2><span>点一下再来一次</span></div>
       <div class="hist">${LS.get('cet4.history', []).map(q => `<a href="#/search/${encodeURIComponent(q)}">${esc(q)}</a>`).join('')}</div>` : ''}
+
+      <div class="section-h"><h2>这里能做什么</h2><span>四项功能</span></div>
+      <div class="features">
+        <article><h3><svg class="ico"><use href="#i-book"/></svg>词库</h3><p>四级 2607 词、六级 2345 词，含音标与释义，按字母或搜索直达。</p></article>
+        <article><h3><svg class="ico"><use href="#i-paper"/></svg>真题练习</h3><p>词汇、语法、阅读三类题，答完即时给解析，答错自动进错题本。</p></article>
+        <article><h3><svg class="ico"><use href="#i-flag"/></svg>错题本</h3><p>错词按错误次数排序，错题按题号归档，都能一键重练。</p></article>
+        <article><h3><svg class="ico"><use href="#i-cards"/></svg>学习模式</h3><p>闪卡与看词选义两种模式，学完自动记为已掌握。</p></article>
+      </div>
 
       <div class="section-h"><h2>今日一词</h2><span>每天换一个</span></div>
       <a class="rel" style="text-decoration:none" href="#/w/${encodeURIComponent(today.n)}">
@@ -1016,6 +1083,56 @@ window.CET4_EXAMPLES = {
     `;
   }
 
+  /* ---------- 真题练习 ---------- */
+  let exam = { i: 0, picked: null, right: 0, wrong: 0 };
+
+  function examPool() {
+    const all = window.CET_QUIZ || [];
+    return level === 'all' ? all : all.filter(q => q.lv === level);
+  }
+
+  function pageExam() {
+    const pool = examPool();
+    const q = pool[exam.i];
+    if (!pool.length) {
+      return `<div class="crumb"><a href="#/">词库</a> / 真题</div>
+        <div class="empty-box">当前词库还没有配套题目，切到「四级」或「六级」再试。</div>`;
+    }
+    if (!q) {
+      return `<div class="crumb"><a href="#/">词库</a> / 真题</div>
+        <div class="exam-done">
+          <h1>这一组做完了</h1>
+          <p>答对 ${exam.right} 题，答错 ${exam.wrong} 题。错题已进入错题本。</p>
+          <button class="btn" style="width:auto" data-exam-reset>再来一组</button>
+        </div>`;
+    }
+    const picked = exam.picked;
+    return `
+      <div class="crumb"><a href="#/">词库</a> / 真题</div>
+      <div class="exam-head">
+        <div class="exam-band"><span>模拟题</span><span>${q.lv === 'cet4' ? 'CET-4' : 'CET-6'} · ${q.type}</span></div>
+        <h1>第 ${exam.i + 1} 题<span class="exam-total">/ ${pool.length}</span></h1>
+      </div>
+      <p class="exam-q">${esc(q.q)}</p>
+      <div class="exam-opts">
+        ${q.opts.map((o, i) => {
+          let cls = '';
+          if (picked !== null) {
+            if (i === q.a) cls = 'right';
+            else if (i === picked) cls = 'wrong';
+          }
+          return `<button class="exam-opt ${cls}" data-opt="${i}"><i>${'ABCD'[i]}</i><span>${esc(o)}</span></button>`;
+        }).join('')}
+      </div>
+      ${picked !== null ? `<div class="exam-tip">
+          <b>${picked === q.a ? '答对' : '答错'}</b>
+          <p>${esc(q.tip)}</p>
+          <button class="btn" style="width:auto" data-exam-next>${exam.i + 1 === pool.length ? '看结果' : '下一题'}</button>
+        </div>` : ''}
+      <p class="meta" style="margin-top:var(--s5)">答对 ${exam.right} · 答错 ${exam.wrong} · 标记为模拟题，题型对齐四六级</p>
+    `;
+  }
+
   /* ---------- 错题本 ---------- */
   function pageWrong() {
     const entries = Object.entries(wrongBook)
@@ -1030,6 +1147,12 @@ window.CET4_EXAMPLES = {
         <button class="btn" data-wrong-practice>重练错题</button>
         <button class="btn" data-wrong-clear>清空错题</button>
       </div>` : ''}
+      ${(() => {
+        const ew = LS.get('cet4.examwrong', {});
+        const qs = (window.CET_QUIZ || []).filter(q => ew[q.id]);
+        return qs.length ? `<div class="section-h" style="margin-top:var(--s6)"><h2>题目错题</h2><span>${qs.length} 题</span></div>
+          <div class="wrong-q">${qs.map(q => `<div><b>${esc(q.q)}</b><p>正确答案：${'ABCD'[q.a]} · ${esc(q.opts[q.a])}<br>${esc(q.tip)}</p></div>`).join('')}</div>` : '';
+      })()}
       ${rows.length
         ? `<div class="wordlist">${rows.map(e => `
             <a href="#/w/${encodeURIComponent(e.w.n)}">
@@ -1121,6 +1244,7 @@ window.CET4_EXAMPLES = {
     else if (parts[0] === 'l') { setActiveNav(''); app.innerHTML = pageLetter(parts[1]); }
     else if (parts[0] === 'book') { setActiveNav('book'); app.innerHTML = pageBook(); }
     else if (parts[0] === 'wrong') { setActiveNav('wrong'); app.innerHTML = pageWrong(); }
+    else if (parts[0] === 'exam') { setActiveNav('exam'); app.innerHTML = pageExam(); }
     else if (parts[0] === 'study') { setActiveNav('study'); app.innerHTML = pageStudy(); }
     else if (parts[0] === 'search') { setActiveNav(''); app.innerHTML = pageSearch(decodeURIComponent(parts.slice(1).join('/'))); }
     else if (parts[0] === 'about') { setActiveNav('about'); app.innerHTML = pageAbout(); }
@@ -1140,7 +1264,7 @@ window.CET4_EXAMPLES = {
 
   /* ---------- 事件 ---------- */
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-book],[data-known],[data-book-know],[data-book-clear],[data-wrong-clear],[data-wrong-practice],[data-study-mode],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
+    const t = e.target.closest('[data-book],[data-known],[data-book-know],[data-book-clear],[data-wrong-clear],[data-wrong-practice],[data-study-mode],[data-opt],[data-exam-next],[data-exam-reset],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
     if (!t) return;
 
     if (t.dataset.speak) {
@@ -1155,6 +1279,27 @@ window.CET4_EXAMPLES = {
         route();
       }
       return;
+    }
+    if (t.hasAttribute('data-opt')) {
+      const pool = examPool();
+      const q = pool[exam.i];
+      if (!q || exam.picked !== null) return;
+      const idx = Number(t.dataset.opt);
+      exam.picked = idx;
+      if (idx === q.a) exam.right++; else {
+        exam.wrong++;
+        const ew = LS.get('cet4.examwrong', {});
+        ew[q.id] = (ew[q.id] || 0) + 1;
+        LS.set('cet4.examwrong', ew);
+      }
+      route();
+      return;
+    }
+    if (t.hasAttribute('data-exam-next')) {
+      exam.i++; exam.picked = null; route(); return;
+    }
+    if (t.hasAttribute('data-exam-reset')) {
+      exam = { i: 0, picked: null, right: 0, wrong: 0 }; route(); return;
     }
     if (t.hasAttribute('data-study-mode')) {
       study.mode = t.dataset.studyMode;
