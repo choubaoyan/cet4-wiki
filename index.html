@@ -271,6 +271,14 @@
   .empty-box { background: var(--block); padding: var(--s7); text-align: center; color: var(--muted); font-size: 15px; }
 
   /* ---- 学习 ---- */
+  .mode-switch { display: flex; gap: var(--s4); margin-bottom: var(--s4); }
+  .mode-switch button {
+    padding: 3px 0; font-size: 13px; color: var(--muted);
+    border-bottom: 2px solid transparent; font-family: var(--font-mono);
+  }
+  .mode-switch button.on { color: var(--ink); border-bottom-color: var(--ink); }
+  .mode-switch button:hover { color: var(--ink); }
+
   .study-meta { display: flex; gap: var(--s6); color: var(--muted); font-size: 11px;
                 font-family: var(--font-mono); letter-spacing: .1em; text-transform: uppercase; margin-bottom: var(--s5); }
   .card-area { display: grid; place-items: center; padding: var(--s6) 0; }
@@ -399,6 +407,7 @@
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v18H6.5A1.5 1.5 0 0 1 5 19.5z"/><path d="M9.5 3v18"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></symbol>
     <symbol id="i-cards" viewBox="0 0 24 24"><rect x="3.5" y="7" width="11" height="14" rx="1.5"/><path d="M7.5 4h9a2 2 0 0 1 2 2v11"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.6v.6"/></symbol>
     <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6.5 9H4v6h2.5L11 19z"/><path d="M15 9.2a4 4 0 0 1 0 5.6"/><path d="M17.6 6.6a8 8 0 0 1 0 10.8"/></symbol>
@@ -434,6 +443,7 @@
     <nav class="nav" id="nav">
       <a href="#/" data-route="home"><svg class="ico"><use href="#i-home"/></svg><span>首页</span></a>
       <a href="#/book" data-route="book"><svg class="ico"><use href="#i-book"/></svg><span>生词本</span><em id="book-count">0</em></a>
+    <a href="#/wrong" data-route="wrong"><svg class="ico"><use href="#i-flag"/></svg><span>错题本</span><em id="wrong-count">0</em></a>
       <a href="#/study" data-route="study"><svg class="ico"><use href="#i-cards"/></svg><span>学习模式</span></a>
       <a href="#/about" data-route="about"><svg class="ico"><use href="#i-info"/></svg><span>关于</span></a>
     </nav>
@@ -522,6 +532,8 @@
   let book = new Set(LS.get('cet4.book', []));
   let known = new Set(LS.get('cet4.known', []));
   let recent = LS.get('cet4.recent', []);
+  let wrongBook = LS.get('cet4.wrong', {});   // { word: 错误次数 }
+  const wrongCount = () => Object.keys(wrongBook).length;
 
   const app = document.getElementById('app');
   const $ = (s) => document.querySelector(s);
@@ -598,6 +610,8 @@
     $('#known-bar').style.width = pct.toFixed(1) + '%';
     $('#book-count').textContent = String(book.size);
     $('#book-count-2').textContent = String(book.size);
+    const wc = document.getElementById('wrong-count');
+    if (wc) wc.textContent = String(Object.keys(wrongBook).length);
   }
 
   function setActiveNav(route) {
@@ -858,6 +872,29 @@
     `;
   }
 
+  /* ---------- 错题本 ---------- */
+  function pageWrong() {
+    const entries = Object.entries(wrongBook)
+      .map(([n, c]) => ({ w: WORDS[INDEX.get(n)] || null, n, c }))
+      .sort((a, b) => b.c - a.c);
+    const rows = entries.filter(e => e.w);
+    return `
+      <div class="crumb"><a href="#/">词库</a> / 错题本</div>
+      <h1 style="font-size:30px;margin-bottom:var(--s2)">错题本</h1>
+      <p style="color:var(--muted);margin:0">${rows.length} 个词被答错过，按错误次数排序。</p>
+      ${rows.length ? `<div class="book-bar">
+        <button class="btn" data-wrong-practice>重练错题</button>
+        <button class="btn" data-wrong-clear>清空错题</button>
+      </div>` : ''}
+      ${rows.length
+        ? `<div class="wordlist">${rows.map(e => `
+            <a href="#/w/${encodeURIComponent(e.w.n)}">
+              <span>${esc(e.w.n)}</span><em>${esc(e.w.t[0] || '')} · 错 ${e.c} 次</em>
+            </a>`).join('')}</div>`
+        : '<div class="empty-box">还没有错题。去「学习模式」做几道题，答错的词会自动出现在这里。</div>'}
+    `;
+  }
+
   /* ---------- 学习模式 ---------- */
   let study = { mode: 'flash', queue: [], i: 0, flipped: false, right: 0, wrong: 0, answered: false };
 
@@ -875,9 +912,14 @@
         <div class="empty-box"><p>这一轮结束了：答对 ${study.right}，答错 ${study.wrong}。</p>
         <button class="btn" style="width:auto;display:inline-block" data-restart>再来一轮</button></div>`;
     }
+    const modeSwitch = `<div class="mode-switch">
+        <button type="button" data-study-mode="flash" class="${study.mode === 'flash' ? 'on' : ''}">闪卡</button>
+        <button type="button" data-study-mode="quiz" class="${study.mode === 'quiz' ? 'on' : ''}">看词选义</button>
+      </div>`;
     if (study.mode === 'flash') {
       return `
         <div class="crumb"><a href="#/">词库</a> / 学习模式</div>
+        ${modeSwitch}
         <div class="study-meta"><span>${book.size ? '生词本' : '全部词库'}</span><span>${study.i + 1} / ${study.queue.length}</span><span>已掌握 ${known.size}</span></div>
         <div class="card-area">
           <div class="flashcard" data-flip>
@@ -896,6 +938,7 @@
     const shuffled = options.slice().sort(() => Math.random() - 0.5);
     return `
       <div class="crumb"><a href="#/">词库</a> / 学习模式</div>
+      ${modeSwitch}
       <div class="study-meta"><span>看词选义</span><span>${study.i + 1} / ${study.queue.length}</span><span>对 ${study.right} · 错 ${study.wrong}</span></div>
       <div style="margin:26px 0 8px;font-size:36px;font-family:ui-monospace,monospace">${esc(w.n)}</div>
       <div style="color:var(--muted);font-family:ui-monospace,monospace;margin-bottom:18px">${esc(w.u)}</div>
@@ -933,6 +976,7 @@
     if (parts[0] === 'w') { setActiveNav(''); app.innerHTML = pageWord(decodeURIComponent(parts.slice(1).join('/'))); }
     else if (parts[0] === 'l') { setActiveNav(''); app.innerHTML = pageLetter(parts[1]); }
     else if (parts[0] === 'book') { setActiveNav('book'); app.innerHTML = pageBook(); }
+    else if (parts[0] === 'wrong') { setActiveNav('wrong'); app.innerHTML = pageWrong(); }
     else if (parts[0] === 'study') { setActiveNav('study'); app.innerHTML = pageStudy(); }
     else if (parts[0] === 'search') { setActiveNav(''); app.innerHTML = pageSearch(decodeURIComponent(parts.slice(1).join('/'))); }
     else if (parts[0] === 'about') { setActiveNav('about'); app.innerHTML = pageAbout(); }
@@ -952,7 +996,7 @@
 
   /* ---------- 事件 ---------- */
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-book],[data-known],[data-book-know],[data-book-clear],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
+    const t = e.target.closest('[data-book],[data-known],[data-book-know],[data-book-clear],[data-wrong-clear],[data-wrong-practice],[data-study-mode],[data-speak],[data-flip],[data-know],[data-skip],[data-answer],[data-restart]');
     if (!t) return;
 
     if (t.dataset.speak) {
@@ -966,6 +1010,32 @@
         LS.set('cet4.book', []);
         route();
       }
+      return;
+    }
+    if (t.hasAttribute('data-study-mode')) {
+      study.mode = t.dataset.studyMode;
+      study.i = 0; study.flipped = false;
+      route();
+      return;
+    }
+    if (t.hasAttribute('data-wrong-clear')) {
+      const n = Object.keys(wrongBook).length;
+      if (!n) return;
+      if (window.confirm('清空 ' + n + ' 个错题记录？')) {
+        wrongBook = {};
+        LS.set('cet4.wrong', {});
+        route();
+      }
+      return;
+    }
+    if (t.hasAttribute('data-wrong-practice')) {
+      const pool = Object.keys(wrongBook).map(n => WORDS[INDEX.get(n)]).filter(Boolean);
+      if (!pool.length) return;
+      study.queue = pool.slice().sort(() => Math.random() - 0.5).slice(0, 20);
+      study.i = 0; study.right = 0; study.wrong = 0; study.flipped = false; study.answered = false;
+      study.mode = 'quiz';
+      location.hash = '#/study';
+      route();
       return;
     }
     if (t.hasAttribute('data-book-know')) {
@@ -1005,6 +1075,14 @@
         if (el) el.classList.add('right');
       }
       ok ? study.right++ : study.wrong++;
+      if (!ok) {
+        wrongBook[w.n] = (wrongBook[w.n] || 0) + 1;
+        LS.set('cet4.wrong', wrongBook);
+        if (ok) {} 
+      } else if (wrongBook[w.n]) {
+        delete wrongBook[w.n];
+        LS.set('cet4.wrong', wrongBook);
+      }
       if (ok) known.add(w.lower);
       LS.set('cet4.known', [...known]);
       setTimeout(() => { study.i++; route(); }, ok ? 420 : 1100);
